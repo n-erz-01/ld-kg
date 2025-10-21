@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TACTICAL NETWORK</title>
+  
+  <!-- Google Fonts - JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- React and ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  
+  <!-- Force Graph -->
+  <script src="https://unpkg.com/react-force-graph-2d"></script>
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <style>
+    :root {
+      --font-family: 'JetBrains Mono', 'Courier New', monospace;
+      --bg-primary: #FFFFFF;
+      --bg-secondary: #F5F5F5;
+      --bg-panel: #E5E5E5;
+      --text-primary: #000000;
+      --text-secondary: #333333;
+      --text-muted: #666666;
+      --accent-orange: #FF8C00;
+      --accent-orange-dark: #E67E00;
+      --border-thick: 3px;
+      --border-medium: 2px;
+      --border-thin: 1px;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      font-weight: 400;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+    }
+
+    /* Authentication Modal Styles */
+    #auth-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-container {
+      background: var(--bg-panel);
+      padding: 30px;
+      border: var(--border-thick) solid var(--text-primary);
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .auth-title {
+      margin: 0 0 20px 0;
+      font-family: var(--font-family);
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--text-primary);
+      text-transform: uppercase;
+    }
+
+    .auth-subtitle {
+      margin: 0 0 20px 0;
+      color: var(--text-muted);
+      font-family: var(--font-family);
+      font-weight: 400;
+      font-size: 12px;
+    }
+
+    .auth-input {
+      width: 100%;
+      padding: 12px;
+      border: var(--border-medium) solid var(--text-primary);
+      font-size: 14px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      font-weight: 400;
+    }
+
+    .auth-input:focus {
+      outline: none;
+      border-color: var(--accent-orange);
+    }
+
+    .auth-button {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: var(--border-medium) solid var(--text-primary);
+      padding: 8px 16px;
+      font-size: 12px;
+      cursor: pointer;
+      width: 100%;
+      font-family: var(--font-family);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .auth-button:hover {
+      background: var(--accent-orange);
+      color: var(--bg-primary);
+    }
+
+    .auth-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .auth-error {
+      color: #d32f2f;
+      margin-top: 10px;
+      font-size: 12px;
+      display: none;
+    }
+
+    .auth-success {
+      color: #2e7d32;
+      margin-top: 10px;
+      font-size: 12px;
+      display: none;
+    }
+
+    /* Main App Styles */
+    #main-container {
+      display: flex;
+      height: 100vh;
+    }
+
+    #text-section {
+      width: 40%;
+      padding: 20px;
+      background-color: var(--bg-primary);
+    }
+
+    #graph-section {
+      width: 60%;
+      background-color: var(--bg-primary);
+    }
+
+    #graph {
+      width: 100%;
+      height: 100%;
+    }
+
+    .main-title {
+      font-family: var(--font-family);
+      font-weight: 700;
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+      text-transform: uppercase;
+    }
+
+    .story-title {
+      font-family: var(--font-family);
+      font-weight: 500;
+      font-size: 16px;
+      margin-bottom: 15px;
+      color: var(--text-primary);
+      text-transform: uppercase;
+    }
+
+    .story-text {
+      font-family: var(--font-family);
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 1.6;
+      margin-bottom: 15px;
+      color: var(--text-secondary);
+      color: black;
+      margin-bottom: 20px;
+    }
+
+    .team-guidance {
+      font-family: 'Inter', 'Helvetica Neue', sans-serif;
+      font-size: 12px;
+      color: #666;
+      font-style: italic;
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+    }
+
+    .user-info {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--bg-panel);
+      padding: 10px 15px;
+      border: var(--border-medium) solid var(--text-primary);
+      font-size: 12px;
+      z-index: 1000;
+      font-family: var(--font-family);
+      font-weight: 500;
+    }
+
+    .sign-out-btn {
+      background: var(--accent-orange);
+      color: var(--bg-primary);
+      border: var(--border-thin) solid var(--text-primary);
+      padding: 4px 8px;
+      font-size: 10px;
+      cursor: pointer;
+      margin-left: 8px;
+      font-family: var(--font-family);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .sign-out-btn:hover {
+      background: var(--accent-orange-dark);
+    }
+
+    /* Override force graph library default styling */
+    .force-graph-tooltip {
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+    }
+
+    .force-graph-tooltip div {
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+    }
+
+    /* Additional overrides for any tooltip styling */
+    [class*="tooltip"], [class*="label"], [id*="tooltip"], [id*="label"] {
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+    }
+
+    /* Override any SVG or canvas styling */
+    svg, canvas {
+      border: none !important;
+      outline: none !important;
+    }
+
+    /* More specific overrides for force graph tooltips */
+    div[style*="background: white"] {
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+    }
+
+    /* Target any div with inline styles that might be the tooltip */
+    div[style*="padding: 8px"] {
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Authentication Modal -->
+  <div id="auth-modal">
+    <div class="auth-container">
+      <h2 class="auth-title">Welcome</h2>
+      <p class="auth-subtitle">Enter your credentials to access the network</p>
+      
+      <form id="auth-form">
+        <input type="text" id="user-name" class="auth-input" placeholder="Your name" required>
+        <input type="password" id="team-password" class="auth-input" placeholder="Team password" required>
+        
+        <button type="submit" id="sign-in-btn" class="auth-button">
+          Sign In
+        </button>
+      </form>
+      
+      <div id="auth-error" class="auth-error"></div>
+      <div id="auth-success" class="auth-success"></div>
+    </div>
+  </div>
+
+  <!-- User Info Bar -->
+  <div id="user-info" class="user-info" style="display: none;">
+    <span id="user-name-display"></span>
+    <button id="sign-out-btn" class="sign-out-btn">Sign Out</button>
+  </div>
+
+  <!-- Main Application -->
+  <div id="main-container" style="display: none;">
+    <div id="text-section">
+      <div class="main-title">The Network Effect</div>
+      
+      <div class="story-title">Building Bridges in Silicon Valley</div>
+      
+      <div class="story-text">
+        In the heart of Silicon Valley, where innovation meets opportunity, a network of extraordinary individuals has emerged. These are the builders, the dreamers, and the connectors who shape the future of technology.
+        
+        From the bustling streets of San Francisco to the innovation hubs of Palo Alto, each connection tells a story. Entrepreneurs who've built empires from garage startups, investors who've backed the next unicorns, and operators who've scaled companies to global success.
+        
+        This knowledge graph captures not just the professional relationships, but the shared experiences, mutual interests, and collaborative spirit that drives the tech ecosystem forward. Each node represents a person, each connection a bridge between ideas and opportunities.
+        
+        The network grows stronger with every interaction, every meeting, every shared vision. It's more than just contacts—it's a living map of the relationships that power innovation.
+      </div>
+      
+      <!-- Like and Comment Section for Main Text -->
+      <div style="margin-top: 20px; padding: 15px; background: var(--bg-secondary); border: var(--border-medium) solid var(--text-primary);">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+          <button onclick="likeTextSection('network_effect')" id="like-btn-network_effect" style="background: var(--bg-secondary); color: var(--text-primary); border: var(--border-medium) solid var(--text-primary); padding: 4px 8px; font-size: 11px; font-family: var(--font-family); font-weight: 500; cursor: pointer;">
+            👍 0
+          </button>
+          <input type="text" id="comment-input-network_effect" placeholder="Add comment about this text..." style="flex: 1; padding: 4px; border: var(--border-medium) solid var(--text-primary); font-size: 11px; font-family: var(--font-family); font-weight: 400; background: var(--bg-primary); color: var(--text-primary);" onkeypress="if(event.key==='Enter') addTextComment('network_effect')">
+        </div>
+        
+        <div id="comments-network_effect" style="max-height: 100px; overflow-y: auto; font-size: 10px;">
+          <!-- Comments will be loaded here -->
+        </div>
+      </div>
+    </div>
+    
+    <div id="graph-section">
+      <div id="graph"></div>
+    </div>
+  </div>
+
+  <script src="//cdn.jsdelivr.net/npm/@babel/standalone"></script>
+  
+  <!-- Load configuration files -->
+  <script src="./config.local.js"></script>
+  <script src="./config.js"></script>
+  
+  <script>
+    console.log('Starting Knowledge Graph with Authentication...');
+    
+    // Wait for all scripts to load
+    function waitForScripts() {
+      if (typeof React !== 'undefined' && 
+          typeof ReactDOM !== 'undefined' && 
+          typeof window.ForceGraph2D !== 'undefined' &&
+          typeof window.supabase !== 'undefined') {
+        console.log('All scripts loaded, starting app...');
+        startApp();
+      } else {
+        console.log('Waiting for scripts to load...');
+        setTimeout(waitForScripts, 100);
+      }
+    }
+    
+    function startApp() {
+      console.log('Starting main application...');
+      console.log('Current window.CONFIG:', window.CONFIG);
+      
+      // Supabase Configuration - Load from environment or config
+      const SUPABASE_URL = window.CONFIG?.SUPABASE_URL;
+      const SUPABASE_ANON_KEY = window.CONFIG?.SUPABASE_ANON_KEY;
+      
+      console.log('SUPABASE_URL:', SUPABASE_URL);
+      console.log('SUPABASE_ANON_KEY:', SUPABASE_ANON_KEY ? 'Present' : 'Missing');
+      
+      // Check if configuration is loaded
+      if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+        console.error('Missing Supabase configuration. Please check your config.local.js file.');
+        console.error('Available config keys:', Object.keys(window.CONFIG || {}));
+        alert('Configuration error: Missing Supabase credentials. Please check your setup.');
+        return;
+      }
+      
+      // Initialize Supabase client
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      console.log('Supabase client initialized');
+
+      // Authentication Configuration - Load from environment or config
+      const TEAM_PASSWORD = window.CONFIG?.TEAM_PASSWORD;
+      
+      // Check if team password is configured
+      if (!TEAM_PASSWORD) {
+        console.error('Missing team password configuration. Please check your config.local.js file.');
+        alert('Configuration error: Missing team password. Please check your setup.');
+        return;
+      }
+      let currentUser = null;
+
+      // Authentication Functions
+      function showAuthModal() {
+        console.log('Showing auth modal');
+        document.getElementById('auth-modal').style.display = 'flex';
+        document.getElementById('main-container').style.display = 'none';
+        document.getElementById('user-info').style.display = 'none';
+      }
+
+      function showMainApp() {
+        console.log('Showing main app');
+        document.getElementById('auth-modal').style.display = 'none';
+        document.getElementById('main-container').style.display = 'flex';
+        document.getElementById('user-info').style.display = 'block';
+        
+        // Update user info display
+        document.getElementById('user-name-display').textContent = `Signed in as: ${currentUser.name}`;
+        
+        // Initialize graph after showing main app
+        initializeGraph();
+      }
+
+      function showError(message) {
+        const errorDiv = document.getElementById('auth-error');
+        const successDiv = document.getElementById('auth-success');
+        
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        successDiv.style.display = 'none';
+        
+        setTimeout(() => {
+          errorDiv.style.display = 'none';
+        }, 5000);
+      }
+
+      function showSuccess(message) {
+        const errorDiv = document.getElementById('auth-error');
+        const successDiv = document.getElementById('auth-success');
+        
+        successDiv.textContent = message;
+        successDiv.style.display = 'block';
+        errorDiv.style.display = 'none';
+        
+        setTimeout(() => {
+          successDiv.style.display = 'none';
+        }, 3000);
+      }
+
+      async function signIn(userName, password) {
+        console.log('Attempting sign in for:', userName);
+        
+        try {
+          // Validate credentials
+          if (!userName.trim()) {
+            showError('Please enter your name');
+            return false;
+          }
+          
+          if (password !== TEAM_PASSWORD) {
+            showError('Incorrect password');
+            return false;
+          }
+          
+          // Create user object
+          currentUser = {
+            name: userName.trim(),
+            id: Date.now().toString(),
+            email: userName.toLowerCase().replace(/\s+/g, '') + '@team.local',
+            signInTime: new Date().toISOString()
+          };
+          
+          // Store user session in localStorage
+          localStorage.setItem('knowledgeGraphUser', JSON.stringify(currentUser));
+          
+          console.log('User signed in successfully:', currentUser);
+          showSuccess('Welcome back!');
+          
+          // Show main app after brief delay
+          setTimeout(() => {
+            showMainApp();
+          }, 1000);
+          
+          return true;
+          
+        } catch (error) {
+          console.error('Sign in error:', error);
+          showError('Sign in failed. Please try again.');
+          return false;
+        }
+      }
+
+      function signOut() {
+        console.log('Signing out user');
+        localStorage.removeItem('knowledgeGraphUser');
+        currentUser = null;
+        showAuthModal();
+      }
+
+      function checkAuthStatus() {
+        console.log('Checking auth status');
+        const savedUser = localStorage.getItem('knowledgeGraphUser');
+        
+        if (savedUser) {
+          try {
+            currentUser = JSON.parse(savedUser);
+            console.log('Found saved user:', currentUser);
+            showMainApp();
+          } catch (error) {
+            console.error('Error parsing saved user:', error);
+            localStorage.removeItem('knowledgeGraphUser');
+            showAuthModal();
+          }
+        } else {
+          console.log('No saved user found');
+          showAuthModal();
+        }
+      }
+
+
+      // Data will be loaded from Supabase
+      let myData = {
+        nodes: [],
+        links: []
+      };
+
+      // Simplified connection generator
+      const generateSemanticLinks = (nodes) => {
+        const links = [];
+        
+        // Only Ivy League + Oxford + Stanford
+        const eliteSchools = new Set([
+          'harvard', 'stanford', 'mit', 'yale', 'princeton', 'columbia', 'university of pennsylvania', 'upenn', 
+          'brown', 'dartmouth', 'cornell', 'cambridge', 'oxford'
+        ]);
+        
+        // Simple text normalization
+        const normalize = (text) => text?.toLowerCase().replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim() || '';
+        
+        // Extract companies from work experience
+        const getWorkCompanies = (workExp) => {
+          if (!workExp?.length) return [];
+          return workExp
+            .map(exp => normalize(exp.companyName))
+            .filter(company => company.length > 1);
+        };
+        
+        // Extract elite schools from education
+        const getEliteSchools = (education) => {
+          if (!education?.length) return [];
+          return education
+            .map(edu => normalize(edu.name))
+            .filter(school => eliteSchools.has(school));
+        };
+        
+        // Curated list of meaningful companies/entities from your network
+        const knownEntities = new Set([
+          // Major Tech Companies
+          'google', 'microsoft', 'amazon', 'apple', 'meta', 'facebook', 'netflix', 'spotify', 'uber', 'airbnb',
+          // AI/Tech
+          'openai', 'anthropic', 'deepmind', 'elevenlabs', 'mistral', 'hugging face',
+          // Finance/Banking
+          'goldman sachs', 'deutsche bank', 'jpmorgan', 'morgan stanley', 'blackrock',
+          // VCs
+          'atomico', 'dawn capital', 'balderton', 'creandum', 'localglobe', 'latitude',
+          // Startups
+          'granola', 'marloo', 'lovable', 'replit', 'supabase', 'attio',
+          // Other
+          'oxford', 'cambridge', 'stanford', 'harvard', 'mit'
+        ]);
+        
+        // Extract company mentions from notes
+        const getNoteMentions = (notes) => {
+          if (!notes) return [];
+          const normalizedNotes = normalize(notes);
+          const mentions = [];
+          
+          knownEntities.forEach(entity => {
+            if (normalizedNotes.includes(entity)) {
+              mentions.push(entity);
+            }
+          });
+          
+          return mentions;
+        };
+        
+        // Generate connections between all pairs of nodes
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            const node1 = nodes[i];
+            const node2 = nodes[j];
+            
+            // 1. Work experience connections (highest priority)
+            const companies1 = getWorkCompanies(node1.workExperience);
+            const companies2 = getWorkCompanies(node2.workExperience);
+            const commonCompanies = companies1.filter(company => companies2.includes(company));
+            
+            if (commonCompanies.length > 0) {
+              links.push({
+                source: node1.id,
+                target: node2.id,
+                semanticConnection: `Both worked at: ${commonCompanies[0]}`,
+                connectionType: 'worked_same_company',
+                strength: 95
+              });
+              continue; // Skip other connection types
+            }
+            
+            // 2. Elite education connections
+            const schools1 = getEliteSchools(node1.educationHistory);
+            const schools2 = getEliteSchools(node2.educationHistory);
+            const commonSchools = schools1.filter(school => schools2.includes(school));
+            
+            if (commonSchools.length > 0) {
+              links.push({
+                source: node1.id,
+                target: node2.id,
+                semanticConnection: `Both attended: ${commonSchools[0]}`,
+                connectionType: 'same_elite_school',
+                strength: 50
+              });
+              continue; // Skip other connection types
+            }
+            
+            // 3. Notes connections (lowest priority)
+            const notes1 = getNoteMentions(node1.notes);
+            const notes2 = getNoteMentions(node2.notes);
+            const commonNotes = notes1.filter(word => notes2.includes(word));
+            
+            if (commonNotes.length > 0) {
+              links.push({
+                source: node1.id,
+                target: node2.id,
+                semanticConnection: `Both mentioned: ${commonNotes[0]}`,
+                connectionType: 'mentioned_same_thing',
+                strength: 25
+              });
+            }
+          }
+        }
+        
+        return links;
+      };
+
+      // Load people from Supabase
+      async function loadPeopleFromSupabase() {
+        try {
+          console.log('Loading people from Supabase...');
+          const { data, error } = await supabase
+            .from('people')
+            .select('*')
+            .order('name', { ascending: true });
+          
+          if (error) {
+            console.error('Error loading people:', error);
+            alert('Failed to load people: ' + error.message);
+            return;
+          }
+          
+          console.log('Loaded people from Supabase:', data);
+          
+          // Transform Supabase data to graph format
+          myData.nodes = data.map(person => ({
+            id: person.id,
+            name: person.name,
+            company: person.company,
+            role: person.role,
+            expertise: person.expertise,
+            meetingRating: person.meeting_rating, // Changed from strengthOfConnection
+            dateOfMeeting: person.date_of_meeting,
+            locationOfMeeting: person.location_of_meeting,
+            linkedinUrl: person.linkedin_url,
+            attioUrl: person.attio_url,
+            emailAddress: person.email_address,
+            notes: person.notes,
+            imageUrl: person.image_url,
+            meetingImageUrl: person.meeting_image_url,
+            comments: [], 
+            likes: person.likes || 0,
+            // Aviato enrichment fields
+            aviatoId: person.aviato_id,
+            professionalHeadline: person.professional_headline,
+            currentLocation: person.current_location,
+            linkedinId: person.linkedin_id,
+            skills: person.skills || [],
+            computedHighlights: person.computed_highlights || [],
+            workExperience: (() => {
+              try {
+                if (typeof person.work_experience === 'string') {
+                  return JSON.parse(person.work_experience);
+                }
+                return person.work_experience || [];
+              } catch (e) {
+                console.warn('Failed to parse work_experience for', person.name, ':', e);
+                return [];
+              }
+            })(),
+            educationHistory: (() => {
+              try {
+                if (typeof person.education_history === 'string') {
+                  return JSON.parse(person.education_history);
+                }
+                return person.education_history || [];
+              } catch (e) {
+                console.warn('Failed to parse education_history for', person.name, ':', e);
+                return [];
+              }
+            })()
+          }));
+          
+          console.log('Loaded nodes:', myData.nodes);
+          console.log('Sample node:', myData.nodes[0]);
+          
+          console.log('Transformed people:', myData.nodes);
+          
+          // Generate semantic links
+          myData.links = generateSemanticLinks(myData.nodes);
+          console.log('Generated connections:', myData.links.length);
+          
+          // Re-render the graph with new data
+          renderGraph();
+          
+        } catch (err) {
+          console.error('Error loading people:', err);
+          alert('Failed to load people: ' + err.message);
+        }
+      }
+
+      // Interactive Functions with Supabase
+      // Interactive Functions with Supabase - Updated for persistent likes/comments
+      async function likeContact(nodeId) {
+        try {
+          const node = myData.nodes.find(n => n.id === nodeId);
+          if (!node) {
+            console.error('Node not found:', nodeId);
+            return;
+          }
+          
+          // Check if user already liked this person
+          const { data: existingLike, error: checkError } = await supabase
+            .from('likes')
+            .select('*')
+            .eq('user_name', currentUser.name)
+            .eq('target_type', 'person')
+            .eq('target_id', nodeId)
+            .single();
+          
+          if (checkError && checkError.code !== 'PGRST116') {
+            console.error('Error checking existing like:', checkError);
+            return;
+          }
+          
+          if (existingLike) {
+            // User already liked, remove the like
+            const { error: deleteError } = await supabase
+              .from('likes')
+              .delete()
+              .eq('id', existingLike.id);
+              
+            if (deleteError) {
+              console.error('Error removing like:', deleteError);
+              return;
+            }
+            
+            console.log(`Removed like for ${node.name}`);
+          } else {
+            // Add new like
+            const { error: insertError } = await supabase
+              .from('likes')
+              .insert({
+                user_name: currentUser.name,
+                target_type: 'person',
+                target_id: nodeId
+              });
+              
+            if (insertError) {
+              console.error('Error adding like:', insertError);
+              return;
+            }
+            
+            console.log(`Liked ${node.name}!`);
+          }
+          
+          // Refresh the popup to show updated like count and who liked it
+          await loadLikesAndComments(nodeId);
+          showPersistentPopup(node);
+          
+        } catch (error) {
+          console.error('Error liking contact:', error);
+          alert('Failed to like contact. Please try again.');
+        }
+      }
+
+      async function addComment(nodeId) {
+        const node = myData.nodes.find(n => n.id === nodeId);
+        const input = document.getElementById(`comment-input-${nodeId}`);
+        const commentText = input.value.trim();
+        
+        if (commentText && node) {
+          try {
+            // Add comment to Supabase
+            const { error } = await supabase
+              .from('comments')
+              .insert({
+                user_name: currentUser.name,
+                target_type: 'person',
+                target_id: nodeId,
+                comment_text: commentText
+              });
+            
+            if (error) {
+              console.error('Error adding comment:', error);
+              alert('Failed to add comment. Please try again.');
+              return;
+            }
+            
+            input.value = '';
+            
+            // Refresh comments
+            await loadLikesAndComments(nodeId);
+            showPersistentPopup(node);
+            
+            console.log(`Added comment to ${node.name}: ${commentText}`);
+          } catch (error) {
+            console.error('Error adding comment:', error);
+            alert('Failed to add comment. Please try again.');
+          }
+        }
+      }
+
+      // Load likes and comments for a specific target
+      async function loadLikesAndComments(targetId, targetType = 'person') {
+        try {
+          // Load likes
+          const { data: likes, error: likesError } = await supabase
+            .from('likes')
+            .select('user_name, created_at')
+            .eq('target_type', targetType)
+            .eq('target_id', targetId);
+          
+          if (likesError) {
+            console.error('Error loading likes:', likesError);
+            return { likes: [], comments: [] };
+          }
+          
+          // Load comments
+          const { data: comments, error: commentsError } = await supabase
+            .from('comments')
+            .select('user_name, comment_text, created_at')
+            .eq('target_type', targetType)
+            .eq('target_id', targetId)
+            .order('created_at', { ascending: false });
+          
+          if (commentsError) {
+            console.error('Error loading comments:', commentsError);
+            return { likes: likes || [], comments: [] };
+          }
+          
+          return {
+            likes: likes || [],
+            comments: comments || []
+          };
+        } catch (error) {
+          console.error('Error loading likes and comments:', error);
+          return { likes: [], comments: [] };
+        }
+      }
+
+      // Format notes text with proper line breaks and bullet points
+      function formatNotesText(notes) {
+        if (!notes) return '';
+        
+        // Split by line breaks and process each line
+        return notes
+          .split('\n')
+          .map(line => {
+            line = line.trim();
+            if (!line) return '';
+            
+            // If line starts with -, treat as bullet point
+            if (line.startsWith('-')) {
+              return `<div style="margin: 4px 0; padding-left: 12px;">• ${line.substring(1).trim()}</div>`;
+            }
+            // If line starts with *, treat as bullet point
+            else if (line.startsWith('*')) {
+              return `<div style="margin: 4px 0; padding-left: 12px;">• ${line.substring(1).trim()}</div>`;
+            }
+            // Regular line
+            else {
+              return `<div style="margin: 4px 0;">${line}</div>`;
+            }
+          })
+          .join('');
+      }
+
+      // Persistent popup functions
+      async function showPersistentPopup(node) {
+        // Remove existing popup
+        const existingPopup = document.getElementById('persistent-popup');
+        if (existingPopup) {
+          existingPopup.remove();
+        }
+
+        // Load likes and comments from database
+        const { likes, comments } = await loadLikesAndComments(node.id);
+        
+        // Check if current user has liked this person
+        const userLiked = likes.some(like => like.user_name === currentUser.name);
+        const likeCount = likes.length;
+
+        const popup = document.createElement('div');
+        popup.id = 'persistent-popup';
+        popup.style.cssText = `
+          position: fixed;
+          right: 20px;
+          top: 120px;
+          max-height: calc(100vh - 160px);
+          overflow-y: auto;
+          background: var(--bg-panel);
+          border: var(--border-thick) solid var(--text-primary) !important;
+          padding: 15px;
+          z-index: 1000;
+          font-family: var(--font-family);
+          font-weight: 400;
+          color: var(--text-primary);
+          max-width: 560px;
+        `;
+
+        popup.innerHTML = `
+          <div>
+            <div style="margin-bottom: 8px;">
+              <img src="${node.imageUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face'}" 
+                   style="width: 50px; height: 50px; object-fit: cover; border: 1px solid #e0e0e0;" 
+                   alt="${node.name}" />
+            </div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <h3 style="margin: 0; color: var(--text-primary); font-family: var(--font-family); font-weight: 700; font-size: 16px; text-transform: uppercase;">${node.name}</h3>
+                <div style="display: flex; gap: 4px;">
+                  ${node.linkedinUrl ? `
+                     <button onclick="window.open('${node.linkedinUrl}', '_blank')" style="background: var(--bg-secondary); color: var(--text-primary); border: var(--border-medium) solid var(--text-primary); padding: 2px 4px; font-size: 10px; cursor: pointer;">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="#0077b5">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                      </svg>
+                    </button>
+                  ` : ''}
+                  ${node.attioUrl ? `
+                     <button onclick="window.open('${node.attioUrl}', '_blank')" style="background: var(--bg-secondary); color: var(--text-primary); border: var(--border-medium) solid var(--text-primary); padding: 2px 4px; font-size: 10px; cursor: pointer;">
+                      <img src="https://avatars.githubusercontent.com/u/50366930?s=280&v=4" width="12" height="12" alt="Attio" />
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
+              <p style="margin: 2px 0; color: var(--text-secondary); font-family: var(--font-family); font-weight: 400; font-size: 11px;"><strong>COMPANY:</strong> ${node.company}</p>
+              <p style="margin: 2px 0; color: var(--text-secondary); font-family: var(--font-family); font-weight: 400; font-size: 11px;"><strong>ROLE:</strong> ${node.role}</p>
+              <p style="margin: 2px 0; color: var(--text-secondary); font-family: var(--font-family); font-weight: 400; font-size: 11px;"><strong>EXPERTISE:</strong> ${node.expertise}</p>
+              <p style="margin: 2px 0; color: var(--text-secondary); font-family: var(--font-family); font-weight: 400; font-size: 11px;"><strong>MEETING:</strong> ${node.dateOfMeeting} in ${node.locationOfMeeting}</p>
+              
+              <!-- Meeting Rating with Stars -->
+              <div style="margin: 8px 0;">
+                <p style="margin: 2px 0; color: var(--text-secondary); font-family: var(--font-family); font-weight: 400; font-size: 11px;"><strong>MEETING RATING:</strong></p>
+                <div style="margin: 2px 0;">
+                  ${generateStars(node.meetingRating)}
+                </div>
+              </div>
+              
+              <!-- Collapsible Sections -->
+              <div style="margin: 12px 0;">
+                <button onclick="toggleEnrichment('${node.id}')" style="background: var(--accent-orange); color: var(--bg-primary); border: var(--border-medium) solid var(--text-primary); padding: 6px 12px; font-size: 11px; font-family: var(--font-family); font-weight: 500; cursor: pointer; margin-right: 8px;">
+                  ✨ ENRICHMENT
+                </button>
+                <button onclick="toggleNotes('${node.id}')" style="background: var(--bg-secondary); color: var(--text-primary); border: var(--border-medium) solid var(--text-primary); padding: 6px 12px; font-size: 11px; font-family: var(--font-family); font-weight: 500; cursor: pointer;">
+                  📝 NOTES
+                </button>
+              </div>
+              
+              <!-- Enrichment Data Section -->
+              <div id="enrichment-${node.id}" style="margin-top: 8px; display: none;">
+                <div style="border-top: var(--border-thin) solid var(--text-primary); padding-top: 8px;">
+                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <h4 style="margin: 0; color: var(--accent-orange); font-family: var(--font-family); font-weight: 700; font-size: 12px; text-transform: uppercase;">✨ AVIATO ENRICHMENT</h4>
+                    <div id="enrichment-status-${node.id}" style="font-size: 10px; color: var(--text-muted); font-family: var(--font-family);"></div>
+                  </div>
+                  
+                  <div id="enrichment-content-${node.id}">
+                    <!-- Enrichment data will be loaded here -->
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Notes Section -->
+              <div id="notes-${node.id}" style="margin-top: 8px; display: none;">
+                <div style="border-top: var(--border-thin) solid var(--text-primary); padding-top: 8px;">
+                  <h4 style="margin: 0 0 8px 0; color: var(--text-primary); font-family: var(--font-family); font-weight: 700; font-size: 12px; text-transform: uppercase;">📝 NOTES</h4>
+                  <div style="font-family: var(--font-family); font-weight: 400; font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                    ${formatNotesText(node.notes)}
+                  </div>
+                </div>
+              </div>
+              
+              ${node.meetingImageUrl ? `
+                <div style="margin: 8px 0;">
+                  <img src="${node.meetingImageUrl}" 
+                       style="max-width: 150px; height: auto; border: 1px solid #e0e0e0;" 
+                       alt="Meeting with ${node.name}" />
+                </div>
+              ` : ''}
+              
+              <div style="margin-top: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                  <button onclick="likeContact('${node.id}')" style="background: ${userLiked ? 'var(--accent-orange)' : 'var(--bg-secondary)'}; color: ${userLiked ? 'var(--bg-primary)' : 'var(--text-primary)'}; border: var(--border-medium) solid var(--text-primary); padding: 4px 8px; font-size: 11px; font-family: var(--font-family); font-weight: 500; cursor: pointer;">
+                    👍 ${likeCount} ${likes.length > 0 ? `(${likes.map(l => l.user_name).join(', ')})` : ''}
+                  </button>
+                  <input type="text" id="comment-input-${node.id}" placeholder="Add comment..." style="flex: 1; padding: 4px; border: var(--border-medium) solid var(--text-primary); font-size: 11px; font-family: var(--font-family); font-weight: 400; background: var(--bg-secondary); color: var(--text-primary);" onkeypress="if(event.key==='Enter') addComment('${node.id}')">
+                </div>
+                
+                <div id="comments-${node.id}" style="max-height: 100px; overflow-y: auto; font-size: 10px;">
+                  ${comments.map(comment => `
+                    <div style="margin-bottom: 4px; padding: 4px; background: var(--bg-secondary); border-left: var(--border-thin) solid var(--accent-orange);">
+                      <strong>${comment.user_name}:</strong> ${comment.comment_text}
+                      <div style="color: var(--text-muted); font-size: 9px;">${new Date(comment.created_at).toLocaleString()}</div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              
+              <!-- Enrichment Data Section -->
+              <div id="enrichment-${node.id}" style="margin-top: 12px; display: none;">
+                <div style="border-top: 1px solid #e0e0e0; padding-top: 12px;">
+                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <h4 style="margin: 0; color: #007bff; font-family: 'Zoom Pro Compact', 'Inter', 'Helvetica Neue', sans-serif; font-weight: 400; font-size: 14px;">✨ Aviato Enrichment</h4>
+                    <div id="enrichment-status-${node.id}" style="font-size: 10px; color: #666;"></div>
+                  </div>
+                  
+                  <div id="enrichment-content-${node.id}">
+                    <!-- Enrichment data will be loaded here -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        document.body.appendChild(popup);
+        
+        // Load comments from Supabase when popup opens
+        loadComments(node.id);
+      }
+
+      function closePersistentPopup() {
+        const popup = document.getElementById('persistent-popup');
+        if (popup) {
+          popup.remove();
+        }
+      }
+
+      // Render the graph with current data
+      function renderGraph() {
+        if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined' && typeof window.ForceGraph2D !== 'undefined') {
+          console.log('Rendering graph with', myData.nodes.length, 'nodes and', myData.links.length, 'links');
+          
+          // Use global variables
+          const { createRoot } = ReactDOM;
+          const ForceGraph2D = window.ForceGraph2D;
+          
+          createRoot(document.getElementById('graph')).render(
+            React.createElement(ForceGraph2D, {
+              graphData: myData,
+              nodeVal: (node) => {
+                // Map meeting rating to node size
+                const ratingMap = {
+                  '1': 2,
+                  '2': 4,
+                  '3': 6,
+                  '4': 8,
+                  '5': 10
+                };
+                return ratingMap[node.meetingRating] || 5; // Default size
+              },
+              nodeColor: (node) => {
+                // Color nodes based on role
+                const roleColors = {
+                  'VC Investor': '#FF6B6B',     
+                  'Startup Operator': '#4ECDC4',     
+                  'VC Operator': '#FFEAA7',       
+                  'Startup Founder': '#98D8C8',     
+                };
+                const color = roleColors[node.role] || '#CCCCCC';
+                console.log('Node:', node.name, 'Role:', node.role, 'Color:', color);
+                return color;
+              },
+              nodeCanvasObject: (node, ctx, globalScale) => {
+                // Custom node rendering to ensure colors are applied
+                
+                // Get the color from our role-based function
+                const roleColors = {
+                  'VC Investor': '#FF6B6B',     
+                  'Startup Operator': '#4ECDC4',     
+                  'VC Operator': '#FFEAA7',       
+                  'Startup Founder': '#98D8C8',     
+                };
+                const color = roleColors[node.role] || '#CCCCCC';
+                
+                // Calculate node size based on meeting rating
+                const ratingMap = {
+                  '1': 1,
+                  '2': 2,
+                  '3': 3,
+                  '4': 4,
+                  '5': 5
+                };
+                const nodeSize = ratingMap[node.meetingRating] || 5;
+                
+                // Draw node square with dynamic size
+                ctx.fillStyle = color;
+                ctx.fillRect(node.x - nodeSize, node.y - nodeSize, nodeSize * 2, nodeSize * 2);
+              },
+              nodeLabel: (node) => `
+                <div style="background: var(--bg-panel); padding: 8px; border: var(--border-medium) solid var(--text-primary); font-family: var(--font-family); font-weight: 400; color: var(--text-primary);">
+                  <h3 style="margin: 0; color: var(--text-primary); font-family: var(--font-family); font-weight: 700; font-size: 12px; text-transform: uppercase;">${node.name}</h3>
+                  <p style="margin: 2px 0; color: var(--text-secondary); font-family: var(--font-family); font-weight: 400; font-size: 10px;"><strong>COMPANY:</strong> ${node.company}</p>
+                  <p style="margin: 2px 0; color: var(--text-secondary); font-family: var(--font-family); font-weight: 400; font-size: 10px;"><strong>ROLE:</strong> ${node.role}</p>
+                </div>
+              `,
+              linkLabel: (link) => `
+                <div style="background: var(--bg-panel); padding: 8px; border: var(--border-medium) solid var(--text-primary); font-family: var(--font-family); font-weight: 400; color: var(--text-primary);">
+                  <strong>CONNECTION:</strong> ${link.semanticConnection}
+                </div>
+              `,
+              onNodeClick: (node, event) => {
+                event.stopPropagation();
+                showPersistentPopup(node);
+              },
+              onBackgroundClick: () => {
+                closePersistentPopup();
+              },
+              onNodeRightClick: (node) => {
+                alert(`Right-clicked on ${node.name}`);
+              }
+            })
+          );
+        }
+      }
+
+      // Initialize the graph (called after authentication)
+      async function initializeGraph() {
+        console.log('Initializing graph...');
+        
+        // Test database connection
+        
+        // Load contacts from Supabase
+        await loadPeopleFromSupabase();
+        
+        // Load text section likes and comments
+        await loadTextSectionLikesAndComments('network_effect');
+      }
+
+      // Event Listeners
+      document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOM loaded, setting up event listeners...');
+        
+        // Auth form submission
+        const authForm = document.getElementById('auth-form');
+        authForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          
+          const userName = document.getElementById('user-name').value;
+          const password = document.getElementById('team-password').value;
+          
+          const signInBtn = document.getElementById('sign-in-btn');
+          signInBtn.disabled = true;
+          signInBtn.textContent = 'Signing in...';
+          
+          const success = await signIn(userName, password);
+          
+          signInBtn.disabled = false;
+          signInBtn.textContent = 'Sign In';
+          
+          if (!success) {
+            // Error already shown by signIn function
+          }
+        });
+        
+        // Sign out button
+        const signOutBtn = document.getElementById('sign-out-btn');
+        signOutBtn.addEventListener('click', signOut);
+        
+        // Check initial auth status
+        checkAuthStatus();
+      });
+
+      // Enrichment function
+      async function enrichProfile(nodeId) {
+        const node = myData.nodes.find(n => n.id === nodeId);
+        if (!node) {
+          console.error('Node not found:', nodeId);
+          return;
+        }
+
+        const enrichmentSection = document.getElementById(`enrichment-${nodeId}`);
+        const statusDiv = document.getElementById(`enrichment-status-${nodeId}`);
+        const contentDiv = document.getElementById(`enrichment-content-${nodeId}`);
+
+        // Show enrichment section
+        enrichmentSection.style.display = 'block';
+        statusDiv.textContent = 'Loading...';
+        contentDiv.innerHTML = '';
+
+        try {
+          // Check if we already have enrichment data
+          if (node.aviatoId) {
+            statusDiv.textContent = 'Using cached data';
+            displayEnrichmentData(node, contentDiv);
+            return;
+          }
+
+          // If no LinkedIn URL, show error
+          if (!node.linkedinUrl) {
+            statusDiv.textContent = 'No LinkedIn URL available';
+            contentDiv.innerHTML = '<p style="color: #d32f2f; font-size: 11px;">LinkedIn URL required for enrichment</p>';
+            return;
+          }
+
+          statusDiv.textContent = 'No enrichment data available';
+          contentDiv.innerHTML = '<p style="color: #666; font-size: 11px;">This person has not been enriched yet. Run the Python enrichment script to add data.</p>';
+
+        } catch (error) {
+          console.error('Enrichment error:', error);
+          statusDiv.textContent = 'Enrichment failed';
+          contentDiv.innerHTML = '<p style="color: #d32f2f; font-size: 11px;">Failed to enrich profile</p>';
+        }
+      }
+
+      function displayEnrichmentData(node, contentDiv) {
+        let html = '';
+
+        // Professional Headline
+        if (node.professionalHeadline) {
+          html += `
+            <div style="margin-bottom: 8px;">
+              <p style="margin: 0; color: var(--text-primary); font-family: var(--font-family); font-weight: 500; font-size: 11px;"><strong>PROFESSIONAL HEADLINE:</strong></p>
+              <p style="margin: 2px 0 0 0; color: var(--text-secondary); font-family: var(--font-family); font-weight: 400; font-size: 10px;">${node.professionalHeadline}</p>
+            </div>
+          `;
+        }
+
+        // Current Location
+        if (node.currentLocation) {
+          html += `
+            <div style="margin-bottom: 8px;">
+              <p style="margin: 0; color: var(--text-primary); font-family: var(--font-family); font-weight: 500; font-size: 11px;"><strong>CURRENT LOCATION:</strong></p>
+              <p style="margin: 2px 0 0 0; color: var(--text-secondary); font-family: var(--font-family); font-weight: 400; font-size: 10px;">${node.currentLocation}</p>
+            </div>
+          `;
+        }
+
+        // Work Experience (Last 3 positions, most recent first)
+        if (node.workExperience && node.workExperience.length > 0) {
+          // Sort by start date (most recent first) and take first 3
+          const sortedExperience = node.workExperience
+            .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
+            .slice(0, 3);
+          
+          html += `
+            <div style="margin-bottom: 8px;">
+              <p style="margin: 0; color: var(--text-primary); font-family: var(--font-family); font-weight: 500; font-size: 11px;"><strong>RECENT WORK EXPERIENCE:</strong></p>
+              <div style="margin: 2px 0;">
+                ${sortedExperience.map(experience => {
+                  // Get the first position from positionList
+                  const position = experience.positionList && experience.positionList[0];
+                  if (!position) return '';
+                  
+                  return `
+                    <div style="margin: 4px 0; padding: 4px; background: var(--bg-secondary); border-left: var(--border-thin) solid var(--accent-orange); font-size: 10px; font-family: var(--font-family); font-weight: 400; color: var(--text-secondary);">
+                      <strong>${position.title || 'N/A'}</strong> at ${experience.companyName || 'N/A'}
+                      <div style="font-size: 9px; color: var(--text-muted);">
+                        ${new Date(position.startDate).getFullYear()} - ${position.endDate ? new Date(position.endDate).getFullYear() : 'Present'}
+                      </div>
+                      ${position.description ? `<div style="font-size: 9px; color: var(--text-muted); margin-top: 2px;">${position.description.substring(0, 100)}${position.description.length > 100 ? '...' : ''}</div>` : ''}
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        // Education (formatted like work experience)
+        if (node.educationHistory && node.educationHistory.length > 0) {
+          html += `
+            <div style="margin-bottom: 8px;">
+              <p style="margin: 0; color: var(--text-primary); font-family: var(--font-family); font-weight: 500; font-size: 11px;"><strong>EDUCATION:</strong></p>
+              <div style="margin: 2px 0;">
+                ${node.educationHistory.map(edu => `
+                  <div style="margin: 4px 0; padding: 4px; background: var(--bg-secondary); border-left: var(--border-thin) solid var(--accent-orange); font-size: 10px; font-family: var(--font-family); font-weight: 400; color: var(--text-secondary);">
+                    <strong>${edu.name || 'N/A'}</strong> - ${edu.subject || 'N/A'}
+                    ${edu.startDate ? `<div style="font-size: 9px; color: var(--text-muted);">${new Date(edu.startDate).getFullYear()} - ${edu.endDate ? new Date(edu.endDate).getFullYear() : 'Present'}</div>` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        contentDiv.innerHTML = html;
+      }
+
+      // Helper function to generate stars for meeting rating
+      function generateStars(rating) {
+        const numericRating = parseInt(rating);
+        if (!isNaN(numericRating) && numericRating >= 1 && numericRating <= 5) {
+          const stars = numericRating;
+          const starHtml = '★'.repeat(stars) + '☆'.repeat(5 - stars);
+          return `<span style="color: #ffc107; font-size: 20px;">${starHtml}</span>`;
+        }
+        return '';
+      }
+
+      // Toggle enrichment section
+      function toggleEnrichment(nodeId) {
+        const enrichmentSection = document.getElementById(`enrichment-${nodeId}`);
+        const isVisible = enrichmentSection.style.display !== 'none';
+        
+        if (isVisible) {
+          enrichmentSection.style.display = 'none';
+        } else {
+          enrichmentSection.style.display = 'block';
+          // Trigger enrichment if not already loaded
+          enrichProfile(nodeId);
+        }
+      }
+
+      // Toggle notes section
+      function toggleNotes(nodeId) {
+        const notesSection = document.getElementById(`notes-${nodeId}`);
+        const isVisible = notesSection.style.display !== 'none';
+        
+        if (isVisible) {
+          notesSection.style.display = 'none';
+        } else {
+          notesSection.style.display = 'block';
+        }
+      }
+
+      // Text section like and comment functions
+      async function likeTextSection(sectionId) {
+        try {
+          // Check if user already liked this text section
+          const { data: existingLike, error: checkError } = await supabase
+            .from('likes')
+            .select('*')
+            .eq('user_name', currentUser.name)
+            .eq('target_type', 'text_section')
+            .eq('target_id', sectionId)
+            .single();
+          
+          if (checkError && checkError.code !== 'PGRST116') {
+            console.error('Error checking existing like:', checkError);
+            return;
+          }
+          
+          if (existingLike) {
+            // User already liked, remove the like
+            const { error: deleteError } = await supabase
+              .from('likes')
+              .delete()
+              .eq('id', existingLike.id);
+              
+            if (deleteError) {
+              console.error('Error removing like:', deleteError);
+              return;
+            }
+            
+            console.log(`Removed like for text section ${sectionId}`);
+          } else {
+            // Add new like
+            const { error: insertError } = await supabase
+              .from('likes')
+              .insert({
+                user_name: currentUser.name,
+                target_type: 'text_section',
+                target_id: sectionId
+              });
+              
+            if (insertError) {
+              console.error('Error adding like:', insertError);
+              return;
+            }
+            
+            console.log(`Liked text section ${sectionId}!`);
+          }
+          
+          // Refresh the like button and comments
+          await loadTextSectionLikesAndComments(sectionId);
+          
+        } catch (error) {
+          console.error('Error liking text section:', error);
+          alert('Failed to like text section. Please try again.');
+        }
+      }
+
+      async function addTextComment(sectionId) {
+        const input = document.getElementById(`comment-input-${sectionId}`);
+        const commentText = input.value.trim();
+        
+        if (commentText) {
+          try {
+            // Add comment to Supabase
+            const { error } = await supabase
+              .from('comments')
+              .insert({
+                user_name: currentUser.name,
+                target_type: 'text_section',
+                target_id: sectionId,
+                comment_text: commentText
+              });
+            
+            if (error) {
+              console.error('Error adding comment:', error);
+              alert('Failed to add comment. Please try again.');
+              return;
+            }
+            
+            input.value = '';
+            
+            // Refresh comments
+            await loadTextSectionLikesAndComments(sectionId);
+            
+            console.log(`Added comment to text section ${sectionId}: ${commentText}`);
+          } catch (error) {
+            console.error('Error adding comment:', error);
+            alert('Failed to add comment. Please try again.');
+          }
+        }
+      }
+
+      // Load likes and comments for text sections
+      async function loadTextSectionLikesAndComments(sectionId) {
+        try {
+          const { likes, comments } = await loadLikesAndComments(sectionId, 'text_section');
+          
+          // Update like button
+          const likeBtn = document.getElementById(`like-btn-${sectionId}`);
+          const userLiked = likes.some(like => like.user_name === currentUser.name);
+          const likeCount = likes.length;
+          
+          if (likeBtn) {
+            likeBtn.style.background = userLiked ? 'var(--accent-orange)' : 'var(--bg-secondary)';
+            likeBtn.style.color = userLiked ? 'var(--bg-primary)' : 'var(--text-primary)';
+            likeBtn.innerHTML = `👍 ${likeCount} ${likes.length > 0 ? `(${likes.map(l => l.user_name).join(', ')})` : ''}`;
+          }
+          
+          // Update comments display
+          const commentsDiv = document.getElementById(`comments-${sectionId}`);
+          if (commentsDiv) {
+            commentsDiv.innerHTML = comments.map(comment => `
+              <div style="margin-bottom: 4px; padding: 4px; background: var(--bg-primary); border-left: var(--border-thin) solid var(--accent-orange);">
+                <strong>${comment.user_name}:</strong> ${comment.comment_text}
+                <div style="color: var(--text-muted); font-size: 9px;">${new Date(comment.created_at).toLocaleString()}</div>
+              </div>
+            `).join('');
+          }
+        } catch (error) {
+          console.error('Error loading text section likes and comments:', error);
+        }
+      }
+
+      // Make functions globally available for onclick handlers
+      window.likeContact = likeContact;
+      window.addComment = addComment;
+      window.enrichProfile = enrichProfile;
+      window.toggleEnrichment = toggleEnrichment;
+      window.toggleNotes = toggleNotes;
+      window.generateStars = generateStars;
+      window.likeTextSection = likeTextSection;
+      window.addTextComment = addTextComment;
+    }
+    
+    // Start waiting for scripts
+    waitForScripts();
+  </script>
+</body>
+</html>
