@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TACTICAL NETWORK</title>
+  <title>nerz.network</title>
   
   <!-- Google Fonts - JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -671,7 +671,6 @@
             meetingImageUrl: person.meeting_image_url,
             comments: [], 
             likes: person.likes || 0,
-            // Aviato enrichment fields
             aviatoId: person.aviato_id,
             professionalHeadline: person.professional_headline,
             currentLocation: person.current_location,
@@ -887,6 +886,12 @@
           .join('');
       }
 
+      // Capitalize first letter of company name
+      function capitalizeCompany(company) {
+        if (!company) return '';
+        return company.charAt(0).toUpperCase() + company.slice(1).toLowerCase();
+      }
+
       // Persistent popup functions
       async function showPersistentPopup(node) {
         // Remove existing popup
@@ -945,7 +950,7 @@
                   ` : ''}
                 </div>
               </div>
-              <p style="margin: 2px 0; color: var(--text-secondary); font-family: var(--font-family); font-weight: 400; font-size: 11px;"><strong>COMPANY:</strong> ${node.company}</p>
+              <p style="margin: 2px 0; color: var(--text-secondary); font-family: var(--font-family); font-weight: 400; font-size: 11px;"><strong>COMPANY:</strong> ${capitalizeCompany(node.company)}</p>
               <p style="margin: 2px 0; color: var(--text-secondary); font-family: var(--font-family); font-weight: 400; font-size: 11px;"><strong>ROLE:</strong> ${node.role}</p>
               <p style="margin: 2px 0; color: var(--text-secondary); font-family: var(--font-family); font-weight: 400; font-size: 11px;"><strong>EXPERTISE:</strong> ${node.expertise}</p>
               <p style="margin: 2px 0; color: var(--text-secondary); font-family: var(--font-family); font-weight: 400; font-size: 11px;"><strong>MEETING:</strong> ${node.dateOfMeeting} in ${node.locationOfMeeting}</p>
@@ -960,11 +965,11 @@
               
               <!-- Collapsible Sections -->
               <div style="margin: 12px 0;">
-                <button onclick="toggleEnrichment('${node.id}')" style="background: var(--accent-orange); color: var(--bg-primary); border: var(--border-medium) solid var(--text-primary); padding: 6px 12px; font-size: 11px; font-family: var(--font-family); font-weight: 500; cursor: pointer; margin-right: 8px;">
-                  ✨ ENRICHMENT
+                <button id="more-details-btn-${node.id}" onclick="toggleMoreDetails('${node.id}')" style="background: var(--accent-orange); color: var(--bg-primary); border: var(--border-medium) solid var(--text-primary); padding: 6px 12px; font-size: 11px; font-family: var(--font-family); font-weight: 500; cursor: pointer; margin-right: 8px;">
+                  🔍 MORE DETAILS
                 </button>
-                <button onclick="toggleNotes('${node.id}')" style="background: var(--bg-secondary); color: var(--text-primary); border: var(--border-medium) solid var(--text-primary); padding: 6px 12px; font-size: 11px; font-family: var(--font-family); font-weight: 500; cursor: pointer;">
-                  📝 NOTES
+                <button id="notes-btn-${node.id}" onclick="toggleNotes('${node.id}')" style="background: var(--bg-secondary); color: var(--text-primary); border: var(--border-medium) solid var(--text-primary); padding: 6px 12px; font-size: 11px; font-family: var(--font-family); font-weight: 500; cursor: pointer;">
+                  📝 COLLAPSE NOTES
                 </button>
               </div>
               
@@ -983,7 +988,7 @@
               </div>
               
               <!-- Notes Section -->
-              <div id="notes-${node.id}" style="margin-top: 8px; display: none;">
+              <div id="notes-${node.id}" style="margin-top: 8px; display: block;">
                 <div style="border-top: var(--border-thin) solid var(--text-primary); padding-top: 8px;">
                   <h4 style="margin: 0 0 8px 0; color: var(--text-primary); font-family: var(--font-family); font-weight: 700; font-size: 12px; text-transform: uppercase;">📝 NOTES</h4>
                   <div style="font-family: var(--font-family); font-weight: 400; font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
@@ -1112,10 +1117,11 @@
               nodeLabel: (node) => `
                 <div style="background: var(--bg-panel); padding: 8px; border: var(--border-medium) solid var(--text-primary); font-family: var(--font-family); font-weight: 400; color: var(--text-primary);">
                   <h3 style="margin: 0; color: var(--text-primary); font-family: var(--font-family); font-weight: 700; font-size: 12px; text-transform: uppercase;">${node.name}</h3>
-                  <p style="margin: 2px 0; color: var(--text-secondary); font-family: var(--font-family); font-weight: 400; font-size: 10px;"><strong>COMPANY:</strong> ${node.company}</p>
+                  <p style="margin: 2px 0; color: var(--text-secondary); font-family: var(--font-family); font-weight: 400; font-size: 10px;"><strong>COMPANY:</strong> ${capitalizeCompany(node.company)}</p>
                   <p style="margin: 2px 0; color: var(--text-secondary); font-family: var(--font-family); font-weight: 400; font-size: 10px;"><strong>ROLE:</strong> ${node.role}</p>
                 </div>
               `,
+              linkWidth: 3,
               linkLabel: (link) => `
                 <div style="background: var(--bg-panel); padding: 8px; border: var(--border-medium) solid var(--text-primary); font-family: var(--font-family); font-weight: 400; color: var(--text-primary);">
                   <strong>CONNECTION:</strong> ${link.semanticConnection}
@@ -1310,29 +1316,45 @@
         return '';
       }
 
-      // Toggle enrichment section
-      function toggleEnrichment(nodeId) {
+      // Toggle more details (enrichment) section
+      function toggleMoreDetails(nodeId) {
         const enrichmentSection = document.getElementById(`enrichment-${nodeId}`);
-        const isVisible = enrichmentSection.style.display !== 'none';
+        const notesSection = document.getElementById(`notes-${nodeId}`);
+        const moreDetailsBtn = document.getElementById(`more-details-btn-${nodeId}`);
+        const notesBtn = document.getElementById(`notes-btn-${nodeId}`);
         
-        if (isVisible) {
-          enrichmentSection.style.display = 'none';
-        } else {
-          enrichmentSection.style.display = 'block';
-          // Trigger enrichment if not already loaded
-          enrichProfile(nodeId);
-        }
+        // Hide notes and show enrichment
+        notesSection.style.display = 'none';
+        enrichmentSection.style.display = 'block';
+        
+        // Update button text
+        moreDetailsBtn.textContent = '📝 SHOW NOTES';
+        notesBtn.textContent = '📝 EXPAND NOTES';
+        
+        // Trigger enrichment if not already loaded
+        enrichProfile(nodeId);
       }
 
       // Toggle notes section
       function toggleNotes(nodeId) {
+        const enrichmentSection = document.getElementById(`enrichment-${nodeId}`);
         const notesSection = document.getElementById(`notes-${nodeId}`);
-        const isVisible = notesSection.style.display !== 'none';
+        const moreDetailsBtn = document.getElementById(`more-details-btn-${nodeId}`);
+        const notesBtn = document.getElementById(`notes-btn-${nodeId}`);
         
-        if (isVisible) {
+        const isNotesVisible = notesSection.style.display !== 'none';
+        
+        if (isNotesVisible) {
+          // Hide notes
           notesSection.style.display = 'none';
+          notesBtn.textContent = '📝 EXPAND NOTES';
+          moreDetailsBtn.textContent = '🔍 MORE DETAILS';
         } else {
+          // Show notes and hide enrichment
           notesSection.style.display = 'block';
+          enrichmentSection.style.display = 'none';
+          notesBtn.textContent = '📝 COLLAPSE NOTES';
+          moreDetailsBtn.textContent = '🔍 MORE DETAILS';
         }
       }
 
@@ -1463,7 +1485,7 @@
       window.likeContact = likeContact;
       window.addComment = addComment;
       window.enrichProfile = enrichProfile;
-      window.toggleEnrichment = toggleEnrichment;
+      window.toggleMoreDetails = toggleMoreDetails;
       window.toggleNotes = toggleNotes;
       window.generateStars = generateStars;
       window.likeTextSection = likeTextSection;
