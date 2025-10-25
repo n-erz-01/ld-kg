@@ -339,13 +339,7 @@
       <div class="story-title">Building Bridges in Silicon Valley</div>
       
       <div class="story-text">
-        In the heart of Silicon Valley, where innovation meets opportunity, a network of extraordinary individuals has emerged. These are the builders, the dreamers, and the connectors who shape the future of technology.
-        
-        From the bustling streets of San Francisco to the innovation hubs of Palo Alto, each connection tells a story. Entrepreneurs who've built empires from garage startups, investors who've backed the next unicorns, and operators who've scaled companies to global success.
-        
-        This knowledge graph captures not just the professional relationships, but the shared experiences, mutual interests, and collaborative spirit that drives the tech ecosystem forward. Each node represents a person, each connection a bridge between ideas and opportunities.
-        
-        The network grows stronger with every interaction, every meeting, every shared vision. It's more than just contacts—it's a living map of the relationships that power innovation.
+        <!-- Content loaded dynamically from database -->
       </div>
       
       <!-- Like and Comment Section for Main Text -->
@@ -1182,7 +1176,8 @@
         // Load contacts from Supabase
         await loadPeopleFromSupabase();
         
-        // Load text section likes and comments
+        // Load text section content and interactions
+        await loadTextSectionContent();
         await loadTextSectionLikesAndComments('network_effect');
       }
 
@@ -1510,6 +1505,81 @@
             console.error('Error adding comment:', error);
             alert('Failed to add comment. Please try again.');
           }
+        }
+      }
+
+      // Load text section content from database
+      async function loadTextSectionContent() {
+        try {
+          // Load the network_effect text section
+          const { data: textSection, error } = await supabase
+            .from('text_sections')
+            .select('*')
+            .eq('id', 'network_effect')
+            .single();
+          
+          if (error) {
+            console.error('Error loading text section:', error);
+            return;
+          }
+          
+          if (textSection) {
+            // Update the text content
+            const mainTitle = document.querySelector('.main-title');
+            const storyTitle = document.querySelector('.story-title');
+            const storyText = document.querySelector('.story-text');
+            
+            if (mainTitle) {
+              mainTitle.textContent = `🌐 ${textSection.title || 'The Network Effect'}`;
+            }
+            
+            if (storyTitle) {
+              storyTitle.textContent = 'Building Bridges in Silicon Valley';
+            }
+            
+            if (storyText && textSection.content) {
+              // Format the text with proper markdown-style formatting
+              storyText.innerHTML = textSection.content
+                .split('\n')
+                .map(line => {
+                  const trimmed = line.trim();
+                  if (!trimmed) return '';
+                  
+                  // Handle headers
+                  if (trimmed.startsWith('# ')) {
+                    return `<h1 style="margin: 20px 0 10px 0; font-size: 18px; font-weight: 700; color: var(--text-primary);">${trimmed.substring(2)}</h1>`;
+                  }
+                  if (trimmed.startsWith('## ')) {
+                    return `<h2 style="margin: 16px 0 8px 0; font-size: 16px; font-weight: 700; color: var(--text-primary);">${trimmed.substring(3)}</h2>`;
+                  }
+                  if (trimmed.startsWith('### ')) {
+                    return `<h3 style="margin: 12px 0 6px 0; font-size: 14px; font-weight: 700; color: var(--text-primary);">${trimmed.substring(4)}</h3>`;
+                  }
+                  
+                  // Handle bullet points
+                  if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+                    return `<div style="margin: 4px 0; padding-left: 16px;">• ${trimmed.substring(2)}</div>`;
+                  }
+                  
+                  // Handle numbered lists
+                  if (/^\d+\.\s/.test(trimmed)) {
+                    return `<div style="margin: 4px 0; padding-left: 16px;">${trimmed}</div>`;
+                  }
+                  
+                  // Handle horizontal rules
+                  if (trimmed === '---') {
+                    return `<hr style="margin: 16px 0; border: none; border-top: 1px solid var(--text-primary);">`;
+                  }
+                  
+                  // Regular paragraphs
+                  return `<p style="margin-bottom: 12px; line-height: 1.5;">${trimmed}</p>`;
+                })
+                .join('');
+            }
+          }
+          
+        } catch (error) {
+          console.error('Error loading text section content:', error);
         }
       }
 
