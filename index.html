@@ -31,6 +31,8 @@
       --text-muted: #666666;
       --accent-orange: #FF8C00;
       --accent-orange-dark: #E67E00;
+      --accent-green: #4ECDC4;
+      --accent-green-hover: #45B7B8;
       --border-thick: 3px;
       --border-medium: 2px;
       --border-thin: 1px;
@@ -43,6 +45,35 @@
       font-weight: 400;
       background-color: var(--bg-primary);
       color: var(--text-primary);
+    }
+
+    /* Button hover effects */
+    .popup-button {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: var(--border-medium) solid var(--text-primary);
+      padding: 6px 12px;
+      font-size: 11px;
+      font-family: var(--font-family);
+      font-weight: 500;
+      cursor: pointer;
+      margin-right: 8px;
+      transition: background-color 0.2s ease;
+    }
+
+    .popup-button:hover {
+      background: var(--accent-green);
+      color: var(--bg-primary);
+    }
+
+    .popup-button.active {
+      background: var(--accent-orange);
+      color: var(--bg-primary);
+    }
+
+    .popup-button.enriched-active {
+      background: var(--accent-green);
+      color: var(--bg-primary);
     }
 
     /* Authentication Modal Styles */
@@ -965,10 +996,10 @@
               
               <!-- Collapsible Sections -->
               <div style="margin: 12px 0;">
-                <button id="more-details-btn-${node.id}" onclick="toggleMoreDetails('${node.id}')" style="background: var(--accent-orange); color: var(--bg-primary); border: var(--border-medium) solid var(--text-primary); padding: 6px 12px; font-size: 11px; font-family: var(--font-family); font-weight: 500; cursor: pointer; margin-right: 8px;">
-                  🔍 MORE DETAILS
+                <button id="enriched-profile-btn-${node.id}" onclick="toggleEnrichedProfile('${node.id}')" class="popup-button">
+                  🔍 SHOW ENRICHED PROFILE
                 </button>
-                <button id="notes-btn-${node.id}" onclick="toggleNotes('${node.id}')" style="background: var(--bg-secondary); color: var(--text-primary); border: var(--border-medium) solid var(--text-primary); padding: 6px 12px; font-size: 11px; font-family: var(--font-family); font-weight: 500; cursor: pointer;">
+                <button id="notes-btn-${node.id}" onclick="toggleNotes('${node.id}')" class="popup-button">
                   📝 COLLAPSE NOTES
                 </button>
               </div>
@@ -1121,7 +1152,7 @@
                   <p style="margin: 2px 0; color: var(--text-secondary); font-family: var(--font-family); font-weight: 400; font-size: 10px;"><strong>ROLE:</strong> ${node.role}</p>
                 </div>
               `,
-              linkWidth: 3,
+              linkWidth: 1,
               linkLabel: (link) => `
                 <div style="background: var(--bg-panel); padding: 8px; border: var(--border-medium) solid var(--text-primary); font-family: var(--font-family); font-weight: 400; color: var(--text-primary);">
                   <strong>CONNECTION:</strong> ${link.semanticConnection}
@@ -1316,31 +1347,54 @@
         return '';
       }
 
-      // Toggle more details (enrichment) section
-      function toggleMoreDetails(nodeId) {
+      // Toggle enriched profile section
+      function toggleEnrichedProfile(nodeId) {
         const enrichmentSection = document.getElementById(`enrichment-${nodeId}`);
         const notesSection = document.getElementById(`notes-${nodeId}`);
-        const moreDetailsBtn = document.getElementById(`more-details-btn-${nodeId}`);
+        const enrichedProfileBtn = document.getElementById(`enriched-profile-btn-${nodeId}`);
         const notesBtn = document.getElementById(`notes-btn-${nodeId}`);
+        const popup = document.getElementById('persistent-popup');
         
-        // Hide notes and show enrichment
-        notesSection.style.display = 'none';
-        enrichmentSection.style.display = 'block';
+        const isEnrichedVisible = enrichmentSection.style.display !== 'none';
         
-        // Update button text
-        moreDetailsBtn.textContent = '📝 SHOW NOTES';
-        notesBtn.textContent = '📝 EXPAND NOTES';
-        
-        // Trigger enrichment if not already loaded
-        enrichProfile(nodeId);
+        if (isEnrichedVisible) {
+          // Hide enriched profile and show notes
+          enrichmentSection.style.display = 'none';
+          notesSection.style.display = 'block';
+          
+          // Update button text and classes
+          enrichedProfileBtn.textContent = '🔍 SHOW ENRICHED PROFILE';
+          enrichedProfileBtn.className = 'popup-button';
+          notesBtn.textContent = '📝 COLLAPSE NOTES';
+          notesBtn.className = 'popup-button';
+          
+          // Reset popup color
+          if (popup) {
+            popup.style.backgroundColor = 'var(--bg-panel)';
+          }
+        } else {
+          // Show enriched profile and hide notes
+          enrichmentSection.style.display = 'block';
+          notesSection.style.display = 'none';
+          
+          // Update button text and classes
+          enrichedProfileBtn.textContent = '🔍 HIDE ENRICHED PROFILE';
+          enrichedProfileBtn.className = 'popup-button enriched-active';
+          notesBtn.textContent = '📝 EXPAND NOTES';
+          notesBtn.className = 'popup-button';
+          
+          // Trigger enrichment if not already loaded
+          enrichProfile(nodeId);
+        }
       }
 
       // Toggle notes section
       function toggleNotes(nodeId) {
         const enrichmentSection = document.getElementById(`enrichment-${nodeId}`);
         const notesSection = document.getElementById(`notes-${nodeId}`);
-        const moreDetailsBtn = document.getElementById(`more-details-btn-${nodeId}`);
+        const enrichedProfileBtn = document.getElementById(`enriched-profile-btn-${nodeId}`);
         const notesBtn = document.getElementById(`notes-btn-${nodeId}`);
+        const popup = document.getElementById('persistent-popup');
         
         const isNotesVisible = notesSection.style.display !== 'none';
         
@@ -1348,13 +1402,28 @@
           // Hide notes
           notesSection.style.display = 'none';
           notesBtn.textContent = '📝 EXPAND NOTES';
-          moreDetailsBtn.textContent = '🔍 MORE DETAILS';
+          notesBtn.className = 'popup-button';
+          
+          // Reset popup color
+          if (popup) {
+            popup.style.backgroundColor = 'var(--bg-panel)';
+          }
         } else {
-          // Show notes and hide enrichment
+          // Show notes and hide enriched profile
           notesSection.style.display = 'block';
           enrichmentSection.style.display = 'none';
+          
+          // Update button text and classes
           notesBtn.textContent = '📝 COLLAPSE NOTES';
-          moreDetailsBtn.textContent = '🔍 MORE DETAILS';
+          notesBtn.className = 'popup-button active';
+          enrichedProfileBtn.textContent = '🔍 SHOW ENRICHED PROFILE';
+          enrichedProfileBtn.className = 'popup-button';
+          
+          // Change popup color to orange
+          if (popup) {
+            popup.style.backgroundColor = 'var(--accent-orange)';
+            popup.style.opacity = '0.95';
+          }
         }
       }
 
@@ -1485,7 +1554,7 @@
       window.likeContact = likeContact;
       window.addComment = addComment;
       window.enrichProfile = enrichProfile;
-      window.toggleMoreDetails = toggleMoreDetails;
+      window.toggleEnrichedProfile = toggleEnrichedProfile;
       window.toggleNotes = toggleNotes;
       window.generateStars = generateStars;
       window.likeTextSection = likeTextSection;
