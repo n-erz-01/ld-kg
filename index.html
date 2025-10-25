@@ -1530,11 +1530,11 @@
             const storyText = document.querySelector('.story-text');
             
             if (mainTitle) {
-              mainTitle.textContent = `🌐 ${textSection.title || 'The Network Effect'}`;
+              mainTitle.textContent = `${textSection.title}`;
             }
             
             if (storyTitle) {
-              storyTitle.textContent = 'Building Bridges in Silicon Valley';
+              storyTitle.textContent = `${textSection.story_title}`;
             }
             
             if (storyText && textSection.content) {
