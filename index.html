@@ -388,6 +388,15 @@
     </div>
     
     <div id="graph-section">
+      <!-- Filter Button -->
+      <div style="padding: 15px 20px; background: var(--bg-panel); border-bottom: var(--border-medium) solid var(--text-primary);">
+        <button 
+          id="filter-highlights-btn" 
+          onclick="toggleFiveStarFilter()" 
+          style="background: var(--bg-secondary); color: var(--text-primary); border: var(--border-medium) solid var(--text-primary); padding: 8px 16px; font-size: 12px; font-family: var(--font-family); font-weight: 500; cursor: pointer;">
+          ⭐ Show Highlights Only
+        </button>
+      </div>
       <div id="graph"></div>
     </div>
   </div>
@@ -572,6 +581,15 @@
         nodes: [],
         links: []
       };
+      
+      // Store original unfiltered data
+      let originalData = {
+        nodes: [],
+        links: []
+      };
+      
+      // Filter state
+      let filterActive = false;
 
       // Simplified connection generator
       const generateSemanticLinks = (nodes) => {
@@ -764,6 +782,12 @@
           // Generate semantic links
           myData.links = generateSemanticLinks(myData.nodes);
           console.log('Generated connections:', myData.links.length);
+          
+          // Store original data for filtering
+          originalData = {
+            nodes: JSON.parse(JSON.stringify(myData.nodes)),
+            links: JSON.parse(JSON.stringify(myData.links))
+          };
           
           // Re-render the graph with new data
           renderGraph();
@@ -1213,6 +1237,40 @@
               }
             })
           );
+        }
+      }
+
+      // Toggle filter for 5-star meetings
+      function toggleFiveStarFilter() {
+        filterActive = !filterActive;
+        
+        if (filterActive) {
+          // Filter to only 5-star meetings
+          myData.nodes = originalData.nodes.filter(node => node.meetingRating === '5');
+          
+          // Filter links to only include connections between filtered nodes
+          const filteredNodeIds = new Set(myData.nodes.map(node => node.id));
+          myData.links = originalData.links.filter(link => 
+            filteredNodeIds.has(link.source.id || link.source) && 
+            filteredNodeIds.has(link.target.id || link.target)
+          );
+          
+          console.log('Filtered to', myData.nodes.length, '5-star meetings');
+        } else {
+          // Reset to original data
+          myData.nodes = JSON.parse(JSON.stringify(originalData.nodes));
+          myData.links = JSON.parse(JSON.stringify(originalData.links));
+          
+          console.log('Removed filter, showing all', myData.nodes.length, 'meetings');
+        }
+        
+        // Re-render the graph
+        renderGraph();
+        
+        // Update button text
+        const btn = document.getElementById('filter-highlights-btn');
+        if (btn) {
+          btn.textContent = filterActive ? '🌟 Show All Meetings' : '⭐ Show Highlights Only';
         }
       }
 
@@ -1672,6 +1730,7 @@
       window.generateStars = generateStars;
       window.likeTextSection = likeTextSection;
       window.addTextComment = addTextComment;
+      window.toggleFiveStarFilter = toggleFiveStarFilter;
     }
     
     // Start waiting for scripts
