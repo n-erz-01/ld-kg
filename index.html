@@ -388,8 +388,11 @@
     </div>
     
     <div id="graph-section">
-      <div id="click-instruction" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-panel); padding: 12px 20px; border: var(--border-medium) solid var(--text-primary); font-family: var(--font-family); font-size: 12px; color: var(--text-primary); z-index: 100; white-space: nowrap; pointer-events: none;">
-        👆 Click on nodes to view details
+      <div id="click-instruction" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-panel); padding: 20px; border: var(--border-medium) solid var(--text-primary); font-family: var(--font-family); font-size: 12px; color: var(--text-primary); z-index: 100; pointer-events: none; text-align: left; line-height: 1.6;">
+        <div style="font-weight: 700; margin-bottom: 8px;">GETTING STARTED:</div>
+        <div>1. Click on the nodes to see the people I've met.</div>
+        <div>2. Drag each node (for fun).</div>
+        <div>3. Click "Show Enriched Profile" to see their enriched profile (thanks to Aviato).</div>
       </div>
       <div id="graph"></div>
     </div>
@@ -1180,8 +1183,8 @@
           const { createRoot } = ReactDOM;
           const ForceGraph2D = window.ForceGraph2D;
           
-          createRoot(document.getElementById('graph')).render(
-            React.createElement(ForceGraph2D, {
+          const graphRoot = createRoot(document.getElementById('graph'));
+          const graphElement = React.createElement(ForceGraph2D, {
               graphData: myData,
               nodeVal: (node) => {
                 // Map meeting rating to node size
@@ -1277,9 +1280,34 @@
               // Add alpha decay to keep movement continuous
               alphaDecay: 0.01,
               // Add velocity decay to keep it slow
-              velocityDecay: 0.95
-            })
-          );
+              velocityDecay: 0.95,
+              // Auto zoom to fit all nodes on load
+              onEngineStop: () => {
+                if (typeof window.graphRef !== 'undefined') {
+                  try {
+                    window.graphRef.zoomToFit(400);
+                  } catch(e) {
+                    console.log('Could not zoom to fit:', e);
+                  }
+                }
+              },
+              // Store ref for zoom to fit
+              ref: (graph) => {
+                if (graph) {
+                  window.graphRef = graph;
+                  // Zoom to fit after a short delay
+                  setTimeout(() => {
+                    try {
+                      graph.zoomToFit(400);
+                    } catch(e) {
+                      console.log('Could not zoom to fit:', e);
+                    }
+                  }, 1000);
+                }
+              }
+            });
+            
+          graphRoot.render(graphElement);
         }
       }
 
