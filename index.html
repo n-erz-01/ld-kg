@@ -185,6 +185,7 @@
     #graph-section {
       width: 60%;
       background-color: var(--bg-primary);
+      position: relative;
     }
 
     #graph {
@@ -339,6 +340,7 @@
       <!-- SoundCloud Player (Compact) -->
       <div style="margin-bottom: 20px;">
         <iframe 
+          id="soundcloud-player"
           width="100%" 
           height="166" 
           scrolling="no" 
@@ -347,6 +349,13 @@
           src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1791452107&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
           style="border: var(--border-medium) solid var(--text-primary);">
         </iframe>
+        <script>
+          // Force autoplay after iframe loads
+          document.getElementById('soundcloud-player').addEventListener('load', function() {
+            const iframe = this;
+            iframe.contentWindow.postMessage(JSON.stringify({ method: 'play' }), '*');
+          });
+        </script>
         <div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;">
           <a href="https://soundcloud.com/zorrovian" title="Zorrovian" target="_blank" style="color: #cccccc; text-decoration: none;">Zorrovian</a> · <a href="https://soundcloud.com/zorrovian/bios" title="BIOS" target="_blank" style="color: #cccccc; text-decoration: none;">BIOS</a>
         </div>
@@ -387,7 +396,7 @@
     </div>
     
     <div id="graph-section">
-      <div id="click-instruction" style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: var(--bg-panel); padding: 12px 20px; border: var(--border-medium) solid var(--text-primary); font-family: var(--font-family); font-size: 12px; color: var(--text-primary); z-index: 100; white-space: nowrap;">
+      <div id="click-instruction" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-panel); padding: 12px 20px; border: var(--border-medium) solid var(--text-primary); font-family: var(--font-family); font-size: 12px; color: var(--text-primary); z-index: 100; white-space: nowrap; pointer-events: none;">
         👆 Click on nodes to view details
       </div>
       <div id="graph"></div>
@@ -1016,6 +1025,8 @@
         // Calculate position based on click location
         let popupLeft = '20px';
         let popupTop = '20px';
+        let popupRight = 'auto';
+        
         if (event) {
           const clickX = event.clientX;
           const clickY = event.clientY;
@@ -1025,10 +1036,11 @@
           if (clickX < viewportWidth / 2) {
             // Click on left side, show popup on right
             popupLeft = '60%';
+            popupRight = 'auto';
           } else {
             // Click on right side, show popup on right
             popupLeft = 'auto';
-            popup.style.right = '20px';
+            popupRight = '20px';
           }
           popupTop = `${Math.min(clickY - 20, window.innerHeight - 400)}px`;
         }
@@ -1039,7 +1051,7 @@
           position: fixed;
           left: ${popupLeft};
           top: ${popupTop};
-          ${popupLeft === 'auto' ? 'right: 20px;' : ''}
+          right: ${popupRight};
           max-height: calc(100vh - 160px);
           overflow-y: auto;
           background: var(--bg-panel);
