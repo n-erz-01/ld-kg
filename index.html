@@ -334,6 +334,20 @@
   <!-- Main Application -->
   <div id="main-container" style="display: none;">
     <div id="text-section">
+      <!-- Spotify Player -->
+      <div style="margin-bottom: 20px;">
+        <iframe 
+          style="border-radius: 12px; border: var(--border-medium) solid var(--text-primary);" 
+          src="https://open.spotify.com/embed/track/4uLU6hMCjMI75M1A2tKUQC?utm_source=generator&theme=0" 
+          width="100%" 
+          height="152" 
+          frameBorder="0" 
+          allowfullscreen="" 
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+          loading="lazy">
+        </iframe>
+      </div>
+      
       <div class="main-title">The Network Effect</div>
       
       <div class="story-title">Building Bridges in Silicon Valley</div>
@@ -884,9 +898,25 @@
         }
       }
 
-      // Format notes text with proper line breaks and bullet points
+      // Format notes text with markdown support (links and bold)
       function formatNotesText(notes) {
         if (!notes) return '';
+        
+        // Helper function to process inline markdown
+        function processInlineMarkdown(text) {
+          // Process bold **text** or __text__
+          text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+          text = text.replace(/__(.*?)__/g, '<strong>$1</strong>');
+          
+          // Process italic *text* or _text_
+          text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+          text = text.replace(/_(.*?)_/g, '<em>$1</em>');
+          
+          // Process links [text](url)
+          text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color: var(--accent-orange); text-decoration: underline;">$1</a>');
+          
+          return text;
+        }
         
         // Split by line breaks and process each line
         return notes
@@ -897,15 +927,18 @@
             
             // If line starts with -, treat as bullet point
             if (line.startsWith('-')) {
-              return `<div style="margin: 4px 0; padding-left: 12px;">• ${line.substring(1).trim()}</div>`;
+              const content = processInlineMarkdown(line.substring(1).trim());
+              return `<div style="margin: 4px 0; padding-left: 12px;">• ${content}</div>`;
             }
             // If line starts with *, treat as bullet point
             else if (line.startsWith('*')) {
-              return `<div style="margin: 4px 0; padding-left: 12px;">• ${line.substring(1).trim()}</div>`;
+              const content = processInlineMarkdown(line.substring(1).trim());
+              return `<div style="margin: 4px 0; padding-left: 12px;">• ${content}</div>`;
             }
             // Regular line
             else {
-              return `<div style="margin: 4px 0;">${line}</div>`;
+              const content = processInlineMarkdown(line);
+              return `<div style="margin: 4px 0;">${content}</div>`;
             }
           })
           .join('');
@@ -1311,7 +1344,7 @@
           `;
         }
 
-        // Education (formatted like work experience)
+        // Education
         if (node.educationHistory && node.educationHistory.length > 0) {
           html += `
             <div style="margin-bottom: 8px;">
