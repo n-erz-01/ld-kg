@@ -920,13 +920,14 @@
         
         // Helper function to process inline markdown
         function processInlineMarkdown(text) {
-          // Process bold **text** or __text__
-          text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-          text = text.replace(/__(.*?)__/g, '<strong>$1</strong>');
+          // Process bold **text** or __text__ - works across newlines too
+          text = text.replace(/\*\*([\s\S]*?)\*\*/g, '<strong>$1</strong>');
+          text = text.replace(/__([\s\S]*?)__/g, '<strong>$1</strong>');
           
-          // Process italic *text* or _text_
-          text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
-          text = text.replace(/_(.*?)_/g, '<em>$1</em>');
+          // Process italic *text* but not **bold**
+          // Must check after processing bold
+          text = text.replace(/(?<!<[^>]*)\*([^\*<]+)\*(?![^<]*>)/g, '<em>$1</em>');
+          text = text.replace(/(?<!<[^>]*)_([^_<]+)_(?![^<]*>)/g, '<em>$1</em>');
           
           // Process links [text](url)
           text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color: var(--accent-orange); text-decoration: underline;">$1</a>');
@@ -953,6 +954,11 @@
             else if (line.startsWith('*')) {
               const content = processInlineMarkdown(line.substring(1).trim());
               return `<div style="margin: 4px 0; padding-left: 12px;">• ${content}</div>`;
+            }
+            // If line starts with number, treat as numbered list
+            else if (/^\d+\.\s/.test(line)) {
+              const content = processInlineMarkdown(line.replace(/^\d+\.\s/, ''));
+              return `<div style="margin: 4px 0; padding-left: 12px;">${content}</div>`;
             }
             // Regular line
             else {
