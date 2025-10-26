@@ -243,6 +243,8 @@
       z-index: 1000;
       font-family: var(--font-family);
       font-weight: 500;
+      width: 350px;
+      max-width: 90vw;
     }
 
     .sign-out-btn {
@@ -329,28 +331,28 @@
   <div id="user-info" class="user-info" style="display: none;">
     <span id="user-name-display"></span>
     <button id="sign-out-btn" class="sign-out-btn">Sign Out</button>
+    
+    <!-- SoundCloud Player -->
+    <div style="margin-top: 20px; width: 100%;">
+      <iframe 
+        width="100%" 
+        height="300" 
+        scrolling="no" 
+        frameborder="no" 
+        allow="autoplay" 
+        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A752177665&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
+        style="border-radius: 12px; border: var(--border-medium) solid var(--text-primary);">
+      </iframe>
+      <div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;">
+        <a href="https://soundcloud.com/simplexia-records" title="SIMPLEXIA RECORDS" target="_blank" style="color: #cccccc; text-decoration: none;">SIMPLEXIA RECORDS</a> · 
+        <a href="https://soundcloud.com/simplexia-records/chaos-in-the-cbd-friends-emotional-intelligence-feat-nathan-haines-dave-koor" title="Chaos In The CBD & Friends - Emotional Intelligence (feat. Nathan Haines & Dave Koor)" target="_blank" style="color: #cccccc; text-decoration: none;">Chaos In The CBD & Friends - Emotional Intelligence (feat. Nathan Haines & Dave Koor)</a>
+      </div>
+    </div>
   </div>
 
   <!-- Main Application -->
   <div id="main-container" style="display: none;">
     <div id="text-section">
-      <!-- SoundCloud Player -->
-      <div style="margin-bottom: 20px;">
-        <iframe 
-          width="100%" 
-          height="300" 
-          scrolling="no" 
-          frameborder="no" 
-          allow="autoplay" 
-          src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A752177665&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
-          style="border-radius: 12px; border: var(--border-medium) solid var(--text-primary);">
-        </iframe>
-        <div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;">
-          <a href="https://soundcloud.com/simplexia-records" title="SIMPLEXIA RECORDS" target="_blank" style="color: #cccccc; text-decoration: none;">SIMPLEXIA RECORDS</a> · 
-          <a href="https://soundcloud.com/simplexia-records/chaos-in-the-cbd-friends-emotional-intelligence-feat-nathan-haines-dave-koor" title="Chaos In The CBD & Friends - Emotional Intelligence (feat. Nathan Haines & Dave Koor)" target="_blank" style="color: #cccccc; text-decoration: none;">Chaos In The CBD & Friends - Emotional Intelligence (feat. Nathan Haines & Dave Koor)</a>
-        </div>
-      </div>
-      
       <div class="main-title">The Network Effect</div>
       
       <div class="story-title">Building Bridges in Silicon Valley</div>
