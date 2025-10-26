@@ -1182,8 +1182,8 @@
           const { createRoot } = ReactDOM;
           const ForceGraph2D = window.ForceGraph2D;
           
-          const graphRoot = createRoot(document.getElementById('graph'));
-          const graphElement = React.createElement(ForceGraph2D, {
+          createRoot(document.getElementById('graph')).render(
+            React.createElement(ForceGraph2D, {
               graphData: myData,
               nodeVal: (node) => {
                 // Map meeting rating to node size
@@ -1272,41 +1272,16 @@
                 // Forces will continue to be applied but very weakly
               },
               // Gentle movement parameters
-              linkDistance: 50,
-              linkStrength: 0.3,
-              nodeRepulsion: 2000,
-              nodeStrength: -200,
+              linkDistance: 100,
+              linkStrength: 0.2,
+              nodeRepulsion: 1500,
+              nodeStrength: -150,
               // Add alpha decay to keep movement continuous
               alphaDecay: 0.01,
               // Add velocity decay to keep it slow
-              velocityDecay: 0.95,
-              // Auto zoom to fit all nodes on load
-              onEngineStop: () => {
-                if (typeof window.graphRef !== 'undefined') {
-                  try {
-                    window.graphRef.zoomToFit(400);
-                  } catch(e) {
-                    console.log('Could not zoom to fit:', e);
-                  }
-                }
-              },
-              // Store ref for zoom to fit
-              ref: (graph) => {
-                if (graph) {
-                  window.graphRef = graph;
-                  // Zoom to fit after a short delay
-                  setTimeout(() => {
-                    try {
-                      graph.zoomToFit(400);
-                    } catch(e) {
-                      console.log('Could not zoom to fit:', e);
-                    }
-                  }, 1000);
-                }
-              }
-            });
-            
-          graphRoot.render(graphElement);
+              velocityDecay: 0.95
+            })
+          );
         }
       }
 
