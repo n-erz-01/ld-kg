@@ -958,7 +958,11 @@
             if (!trimmed) continue;
             
             // Check if line contains HTML (already processed markdown)
-            if (trimmed.includes('<') && (trimmed.includes('strong') || trimmed.includes('em') || trimmed.includes('a') || trimmed.includes('img'))) {
+            // Handle img tags specially
+            if (trimmed.includes('<img')) {
+              result += `${trimmed}`;
+            }
+            else if (trimmed.includes('<') && (trimmed.includes('strong') || trimmed.includes('em') || trimmed.includes('a'))) {
               result += `<div style="margin: 4px 0;">${trimmed}</div>`;
             }
             // If line starts with -, treat as bullet point
