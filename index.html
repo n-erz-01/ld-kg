@@ -1241,14 +1241,20 @@
               onNodeRightClick: (node) => {
                 alert(`Right-clicked on ${node.name}`);
               },
-              // Slow down the physics simulation
-              cooldownTicks: 100,
-              onEngineStop: () => console.log('Simulation finished'),
-              // Add damping to slow down movement
+              // Keep physics simulation running continuously but very slowly
+              cooldownTicks: Infinity,
+              onEngineTick: () => {
+                // Forces will continue to be applied but very weakly
+              },
+              // Gentle movement parameters
               linkDistance: 50,
-              linkStrength: 0.5,
-              nodeRepulsion: 4000,
-              nodeStrength: -500
+              linkStrength: 0.3,
+              nodeRepulsion: 2000,
+              nodeStrength: -200,
+              // Add alpha decay to keep movement continuous
+              alphaDecay: 0.01,
+              // Add velocity decay to keep it slow
+              velocityDecay: 0.95
             })
           );
         }
