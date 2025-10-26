@@ -938,35 +938,52 @@
           return text;
         }
         
-        // Split by line breaks and process each line
-        return notes
-          .split('\n')
-          .map(line => {
-            line = line.trim();
-            if (!line) return '';
+        // Process markdown first, then handle formatting
+        const processedNotes = processInlineMarkdown(notes);
+        
+        // Split by double newlines (paragraphs) or single newlines
+        // But preserve HTML tags
+        const paragraphs = processedNotes.split(/\n\n+/);
+        
+        return paragraphs.map(para => {
+          para = para.trim();
+          if (!para) return '';
+          
+          // Split into lines but keep track of HTML
+          const lines = para.split('\n');
+          let result = '';
+          
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed) continue;
             
+            // Check if line contains HTML (already processed markdown)
+            if (trimmed.includes('<') && (trimmed.includes('strong') || trimmed.includes('em') || trimmed.includes('a') || trimmed.includes('img'))) {
+              result += `<div style="margin: 4px 0;">${trimmed}</div>`;
+            }
             // If line starts with -, treat as bullet point
-            if (line.startsWith('-')) {
-              const content = processInlineMarkdown(line.substring(1).trim());
-              return `<div style="margin: 4px 0; padding-left: 12px;">• ${content}</div>`;
+            else if (trimmed.startsWith('-')) {
+              const content = trimmed.substring(1).trim();
+              result += `<div style="margin: 4px 0; padding-left: 12px;">• ${content}</div>`;
             }
             // If line starts with *, treat as bullet point
-            else if (line.startsWith('*')) {
-              const content = processInlineMarkdown(line.substring(1).trim());
-              return `<div style="margin: 4px 0; padding-left: 12px;">• ${content}</div>`;
+            else if (trimmed.startsWith('*')) {
+              const content = trimmed.substring(1).trim();
+              result += `<div style="margin: 4px 0; padding-left: 12px;">• ${content}</div>`;
             }
             // If line starts with number, treat as numbered list
-            else if (/^\d+\.\s/.test(line)) {
-              const content = processInlineMarkdown(line.replace(/^\d+\.\s/, ''));
-              return `<div style="margin: 4px 0; padding-left: 12px;">${content}</div>`;
+            else if (/^\d+\.\s/.test(trimmed)) {
+              const content = trimmed.replace(/^\d+\.\s/, '');
+              result += `<div style="margin: 4px 0; padding-left: 12px;">${content}</div>`;
             }
             // Regular line
             else {
-              const content = processInlineMarkdown(line);
-              return `<div style="margin: 4px 0;">${content}</div>`;
+              result += `<div style="margin: 4px 0;">${trimmed}</div>`;
             }
-          })
-          .join('');
+          }
+          
+          return result;
+        }).join('');
       }
 
       // Capitalize first letter of company name
