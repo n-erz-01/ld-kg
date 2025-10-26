@@ -929,11 +929,11 @@
           text = text.replace(/(?<!<[^>]*)\*([^\*<]+)\*(?![^<]*>)/g, '<em>$1</em>');
           text = text.replace(/(?<!<[^>]*)_([^_<]+)_(?![^<]*>)/g, '<em>$1</em>');
           
-          // Process links [text](url)
-          text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color: var(--accent-orange); text-decoration: underline;">$1</a>');
-          
-          // Process inline images ![alt](url)
+          // Process inline images FIRST ![alt](url) - must come before links
           text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width: 100%; height: auto; margin: 8px 0; border: 2px solid var(--text-primary);" />');
+          
+          // Process links [text](url) - after images to avoid conflict
+          text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color: var(--accent-orange); text-decoration: underline;">$1</a>');
           
           return text;
         }
