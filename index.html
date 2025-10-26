@@ -1244,21 +1244,17 @@
               // Keep physics simulation running continuously but very slowly
               cooldownTicks: Infinity,
               onEngineTick: () => {
-                // Reheat the simulation slightly to keep movement going
-                const currentAlpha = this.alpha();
-                if (currentAlpha < 0.02) {
-                  this.reheat(0.05);
-                }
+                // Forces will continue to be applied but very weakly
               },
               // Gentle movement parameters
               linkDistance: 50,
               linkStrength: 0.3,
               nodeRepulsion: 2000,
               nodeStrength: -200,
-              // Alpha decay keeps simulation alive but very slow
-              alphaDecay: 0.002,
+              // Add alpha decay to keep movement continuous
+              alphaDecay: 0.01,
               // Add velocity decay to keep it slow
-              velocityDecay: 0.98
+              velocityDecay: 0.95
             })
           );
         }
