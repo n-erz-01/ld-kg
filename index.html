@@ -1037,10 +1037,9 @@
 
         popup.innerHTML = `
           <div>
-            <button onclick="closePersistentPopup()" style="position: absolute; top: 10px; right: 10px; background: var(--bg-secondary); border: var(--border-medium) solid var(--text-primary); cursor: pointer; font-family: var(--font-family); font-weight: 700; font-size: 14px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; z-index: 10;">
-              <span style="position: absolute; width: 12px; height: 2px; background: var(--text-primary); transform: rotate(45deg);"></span>
-              <span style="position: absolute; width: 12px; height: 2px; background: var(--text-primary); transform: rotate(-45deg);"></span>
-            </button>
+            <div style="position: absolute; top: 10px; right: 10px; color: var(--text-muted); font-family: var(--font-family); font-size: 10px; pointer-events: none;">
+              Esc to Exit
+            </div>
             <div style="margin-bottom: 8px;">
               <img src="${node.imageUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face'}" 
                    style="width: 50px; height: 50px; object-fit: cover; border: 1px solid #e0e0e0;" 
