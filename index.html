@@ -1240,7 +1240,15 @@
               },
               onNodeRightClick: (node) => {
                 alert(`Right-clicked on ${node.name}`);
-              }
+              },
+              // Slow down the physics simulation
+              cooldownTicks: 100,
+              onEngineStop: () => console.log('Simulation finished'),
+              // Add damping to slow down movement
+              linkDistance: 50,
+              linkStrength: 0.5,
+              nodeRepulsion: 4000,
+              nodeStrength: -500
             })
           );
         }
