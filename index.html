@@ -336,7 +336,7 @@
   <div id="main-container" style="display: none;">
     <div id="text-section">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <div class="main-title">The Network Effect</div>
+        <div class="main-title">Nodes from Europe</div>
         <button id="guide-toggle-btn" onclick="toggleWelcome()" style="background: var(--bg-secondary); border: var(--border-medium) solid var(--text-primary); padding: 6px 12px; font-size: 11px; font-family: var(--font-family); font-weight: 500; cursor: pointer; color: var(--text-primary);">
           Hide Guide
         </button>
@@ -1676,8 +1676,10 @@
               mainTitle.textContent = `${textSection.title}`;
             }
             
-            if (storyTitle) {
+            if (storyTitle && textSection.story_title) {
               storyTitle.textContent = `${textSection.story_title}`;
+            } else if (storyTitle) {
+              storyTitle.textContent = ''; // Hide if no title
             }
             
             if (storyText && textSection.content) {
