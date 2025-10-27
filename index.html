@@ -335,11 +335,15 @@
   <!-- Main Application -->
   <div id="main-container" style="display: none;">
     <div id="text-section">
-      <div class="main-title">The Network Effect</div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <div class="main-title">The Network Effect</div>
+        <button id="guide-toggle-btn" onclick="toggleWelcome()" style="background: var(--bg-secondary); border: var(--border-medium) solid var(--text-primary); padding: 6px 12px; font-size: 11px; font-family: var(--font-family); font-weight: 500; cursor: pointer; color: var(--text-primary);">
+          Show Guide
+        </button>
+      </div>
       
       <!-- Welcome Section -->
-      <div id="welcome-section" style="margin-bottom: 20px; padding: 15px; background: var(--bg-secondary); border: var(--border-medium) solid var(--text-primary); position: relative;">
-        <button onclick="toggleWelcome()" style="position: absolute; top: 10px; right: 10px; background: var(--bg-primary); border: var(--border-medium) solid var(--text-primary); cursor: pointer; font-family: var(--font-family); font-weight: 700; font-size: 14px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">×</button>
+      <div id="welcome-section" style="display: none; margin-bottom: 20px; padding: 15px; background: var(--bg-secondary); border: var(--border-medium) solid var(--text-primary); position: relative;">
         <div style="font-weight: 700; font-size: 14px; margin-bottom: 10px; color: var(--text-primary);">Welcome to my Trip Notes!</div>
         <div style="font-size: 11px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 10px;">
           I've created a summary below. The boxes and visualization isn't just for fun. It's the mapped network of people I met on my trip, and detailed notes of our meetings.
@@ -1195,8 +1199,11 @@
       // Toggle welcome section
       window.toggleWelcome = function() {
         const welcomeSection = document.getElementById('welcome-section');
-        if (welcomeSection) {
-          welcomeSection.style.display = welcomeSection.style.display === 'none' ? 'block' : 'none';
+        const toggleBtn = document.getElementById('guide-toggle-btn');
+        if (welcomeSection && toggleBtn) {
+          const isVisible = welcomeSection.style.display !== 'none';
+          welcomeSection.style.display = isVisible ? 'none' : 'block';
+          toggleBtn.textContent = isVisible ? 'Show Guide' : 'Hide Guide';
         }
       };
 
