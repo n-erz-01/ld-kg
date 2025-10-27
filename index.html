@@ -347,11 +347,11 @@
         <div style="font-weight: 700; font-size: 14px; margin-bottom: 10px; color: var(--text-primary);">WELCOME</div>
         <div style="font-size: 11px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 10px;" id="welcome-text">
           Last month I traveled to Munich for [Bits & Pretzels](https://www.bitsandpretzels.com/), one of Europe's largest startup conferences, then spent a week in London—working remotely while meeting founders and data leaders from top European VCs. I wanted to understand how Europe's ecosystem really works: the capital dynamics, the product culture, and how funds are building AI infrastructure. This site brings these learnings to life.
-          The boxes and visualization isn't just for fun. It's the mapped network of people I met on my trip, and detailed notes of my meetings.
+          The boxes on the right aren't just for fun. They are the mapped network of people I met on my trip, and detailed notes of our meetings.
         </div>
         <div style="font-size: 11px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 10px;">
           <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">THE BOXES = PEOPLE</div>
-          <div>Bigger the box, better the meeting.</div>
+          <div>The bigger the box, the better the meeting.</div>
         </div>
         <div style="font-size: 11px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 10px;">
           <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">THE CONNECTIONS = LINKED COMPANY MENTIONS</div>
@@ -365,6 +365,11 @@
           <div>4. Click 'Show Enriched Profile' to get their work experience and education (thanks to Aviato)</div>
           <div>5. Drag and re-configure the nodes! It's fun.</div>
           <div>6. Like and comment at the bottom of the summary, or on the individual nodes.</div>
+        </div>
+        <div style="margin-top: 15px; text-align: center;">
+          <button onclick="scrollToNodes()" style="background: var(--bg-primary); border: var(--border-medium) solid var(--text-primary); padding: 8px 16px; font-size: 11px; font-family: var(--font-family); font-weight: 700; cursor: pointer; color: var(--text-primary);">
+            TAKE ME TO THE NODES
+          </button>
         </div>
       </div>
       
@@ -1335,6 +1340,14 @@
           welcomeText.innerHTML = processedText;
         }
       }
+
+      // Scroll to nodes button
+      window.scrollToNodes = function() {
+        const graphSection = document.getElementById('graph-section');
+        if (graphSection) {
+          graphSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
 
       // Event Listeners
       document.addEventListener('DOMContentLoaded', () => {
