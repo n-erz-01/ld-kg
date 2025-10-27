@@ -1726,8 +1726,12 @@
                     }
                   }
                   
-                  // Regular paragraphs
-                  return `<p style="margin-bottom: 12px; line-height: 1.5;">${trimmed}</p>`;
+                  // Regular paragraphs - process links within the text
+                  let processedLine = trimmed;
+                  // Replace markdown links [text](url) with HTML links
+                  processedLine = processedLine.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color: var(--accent-orange); text-decoration: underline;">$1</a>');
+                  
+                  return `<p style="margin-bottom: 12px; line-height: 1.5;">${processedLine}</p>`;
                 })
                 .join('');
             }
