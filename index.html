@@ -337,6 +337,31 @@
     <div id="text-section">
       <div class="main-title">The Network Effect</div>
       
+      <!-- Welcome Section -->
+      <div id="welcome-section" style="margin-bottom: 20px; padding: 15px; background: var(--bg-secondary); border: var(--border-medium) solid var(--text-primary); position: relative;">
+        <button onclick="toggleWelcome()" style="position: absolute; top: 10px; right: 10px; background: var(--bg-primary); border: var(--border-medium) solid var(--text-primary); cursor: pointer; font-family: var(--font-family); font-weight: 700; font-size: 14px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">×</button>
+        <div style="font-weight: 700; font-size: 14px; margin-bottom: 10px; color: var(--text-primary);">Welcome to my Trip Notes!</div>
+        <div style="font-size: 11px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 10px;">
+          I've created a summary below. The boxes and visualization isn't just for fun. It's the mapped network of people I met on my trip, and detailed notes of our meetings.
+        </div>
+        <div style="font-size: 11px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 10px;">
+          <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">The boxes = People</div>
+          <div>Bigger the box, better the meeting.</div>
+        </div>
+        <div style="font-size: 11px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 10px;">
+          <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">The connections = Network</div>
+          <div>Connections show mentions of the same company or shared work experience.</div>
+        </div>
+        <div style="font-size: 11px; line-height: 1.5; color: var(--text-secondary);">
+          <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">So:</div>
+          <div>1. Play the song below to step into the network</div>
+          <div>2. Read through the summary below</div>
+          <div>3. Click on each of the nodes and read the meeting notes</div>
+          <div>4. Click 'Show Enriched Profile' to get their work experience and education (thanks to Aviato)</div>
+          <div>5. Drag and re-configure the nodes! It's fun.</div>
+        </div>
+      </div>
+      
       <!-- SoundCloud Player (Compact) -->
       <div style="margin-bottom: 20px;">
         <iframe 
@@ -1183,6 +1208,14 @@
           closePersistentPopup();
         }
       });
+
+      // Toggle welcome section
+      function toggleWelcome() {
+        const welcomeSection = document.getElementById('welcome-section');
+        if (welcomeSection) {
+          welcomeSection.style.display = welcomeSection.style.display === 'none' ? 'block' : 'none';
+        }
+      }
 
       // Render the graph with current data
       function renderGraph() {
