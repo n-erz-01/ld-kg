@@ -413,23 +413,6 @@
     </div>
     
     <div id="graph-section">
-      <div id="click-instruction" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-panel); padding: 20px; border: var(--border-medium) solid var(--text-primary); font-family: var(--font-family); font-size: 12px; color: var(--text-primary); z-index: 100; pointer-events: none; text-align: left; line-height: 1.6;">
-        <div style="font-weight: 700; margin-bottom: 12px;">GETTING STARTED:</div>
-        <div style="margin-bottom: 12px;">
-          <div style="font-weight: 700; margin-bottom: 4px;">What this shows:</div>
-          <div>The nodes represent people I've met. Connections between the nodes are based on mentions of the same companies or shared work experience.</div>
-        </div>
-        <div style="margin-bottom: 12px;">
-          <div style="font-weight: 700; margin-bottom: 4px;">How to explore:</div>
-          <div>1. Click on each node to read notes about the meeting.</div>
-          <div>2. Click "Show Enriched Profile" to see their work experience and education (thanks to Aviato).</div>
-          <div>3. Press Esc to exit the node.</div>
-        </div>
-        <div>
-          <div style="font-weight: 700;">🎵 Play the song while you explore.</div>
-          <div style="font-weight: 700;">💡 Drag each node (for fun!)</div>
-        </div>
-      </div>
       <div id="graph"></div>
     </div>
   </div>
@@ -1210,12 +1193,12 @@
       });
 
       // Toggle welcome section
-      function toggleWelcome() {
+      window.toggleWelcome = function() {
         const welcomeSection = document.getElementById('welcome-section');
         if (welcomeSection) {
           welcomeSection.style.display = welcomeSection.style.display === 'none' ? 'block' : 'none';
         }
-      }
+      };
 
       // Render the graph with current data
       function renderGraph() {
@@ -1293,15 +1276,6 @@
               `,
               onNodeClick: (node, event) => {
                 event.stopPropagation();
-                
-                // Hide instruction on first click
-                const instruction = document.getElementById('click-instruction');
-                if (instruction) {
-                  instruction.style.transition = 'opacity 0.5s';
-                  instruction.style.opacity = '0';
-                  setTimeout(() => instruction.remove(), 500);
-                }
-                
                 showPersistentPopup(node, event);
               },
               onBackgroundClick: () => {
