@@ -1716,6 +1716,16 @@
                     return `<hr style="margin: 16px 0; border: none; border-top: 1px solid var(--text-primary);">`;
                   }
                   
+                  // Handle images ![alt](url)
+                  if (trimmed.match(/^!\[.*?\]\(.+?\)$/)) {
+                    const imgMatch = trimmed.match(/^!\[(.*?)\]\((.+?)\)$/);
+                    if (imgMatch) {
+                      const alt = imgMatch[1];
+                      const url = imgMatch[2];
+                      return `<img src="${url}" alt="${alt}" style="max-width: 100%; height: auto; margin: 16px 0; border: var(--border-medium) solid var(--text-primary);">`;
+                    }
+                  }
+                  
                   // Regular paragraphs
                   return `<p style="margin-bottom: 12px; line-height: 1.5;">${trimmed}</p>`;
                 })
