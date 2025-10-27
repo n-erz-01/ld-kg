@@ -1349,6 +1349,14 @@
         if (graphSection) {
           graphSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+        
+        // Wait for scroll, then open first node popup
+        setTimeout(() => {
+          if (typeof myData !== 'undefined' && myData.nodes && myData.nodes.length > 0) {
+            const firstNode = myData.nodes[0];
+            showPersistentPopup(firstNode);
+          }
+        }, 1000);
       };
 
       // Event Listeners
