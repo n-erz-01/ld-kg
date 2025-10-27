@@ -1350,11 +1350,16 @@
           graphSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         
-        // Wait for scroll, then open first node popup
+        // Wait for scroll, then open Andre's node popup
         setTimeout(() => {
-          if (typeof myData !== 'undefined' && myData.nodes && myData.nodes.length > 0) {
-            const firstNode = myData.nodes[0];
-            showPersistentPopup(firstNode);
+          if (typeof myData !== 'undefined' && myData.nodes) {
+            const andreNode = myData.nodes.find(node => node.id === '67950f9d-1c36-4f68-98f1-3797b03818fd');
+            if (andreNode) {
+              showPersistentPopup(andreNode);
+            } else if (myData.nodes.length > 0) {
+              // Fallback to first node if Andre not found
+              showPersistentPopup(myData.nodes[0]);
+            }
           }
         }, 1000);
       };
