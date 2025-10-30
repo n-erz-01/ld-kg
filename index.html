@@ -346,7 +346,7 @@
       <div id="welcome-section" style="margin-bottom: 20px; padding: 15px; background: var(--bg-secondary); border: var(--border-medium) solid var(--text-primary); position: relative;">
         <div style="font-weight: 700; font-size: 14px; margin-bottom: 10px; color: var(--text-primary);">WELCOME</div>
         <div style="font-size: 11px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 10px;" id="welcome-text">
-          Last month I traveled to Munich for [Bits & Pretzels](https://www.bitsandpretzels.com/), one of Europe's largest startup conferences, then spent a week in London—working remotely while meeting founders and data leaders from top European VCs. I wanted to understand how Europe's ecosystem really works: the capital dynamics, the product culture, and how funds are building AI infrastructure. This site brings these learnings to life.
+          Last month I traveled to Munich for [Bits & Pretzels](https://www.bitsandpretzels.com/), one of Europe's largest startup conferences, then spent a week in London - working remotely while meeting founders and data leaders from top European VCs. I wanted to understand how Europe's ecosystem really works: the capital dynamics, the product culture, and how funds are building with AI. This site brings these learnings to life.
           The boxes on the right aren't just for fun. They are the mapped network of people I met on my trip, and detailed notes of our meetings.
         </div>
         <div style="font-size: 11px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 10px;">
@@ -355,7 +355,7 @@
         </div>
         <div style="font-size: 11px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 10px;">
           <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">THE CONNECTIONS = LINKED COMPANY MENTIONS</div>
-          <div>Nodes are connected when people mention the same company or have shared work experience.</div>
+          <div>Nodes are connected when people have shared work experience or education.</div>
         </div>
         <div style="font-size: 11px; line-height: 1.5; color: var(--text-secondary);">
           <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">SO NOW</div>
@@ -632,12 +632,33 @@
             .filter(company => company.length > 1);
         };
         
-        // Extract elite schools from education
-        const getEliteSchools = (education) => {
+        // Extract schools from education (normalized)
+        const getSchools = (education) => {
           if (!education?.length) return [];
           return education
             .map(edu => normalize(edu.name))
-            .filter(school => eliteSchools.has(school));
+            .filter(school => school.length > 1);
+        };
+
+        // Simple fuzzy matcher: exact, substring, or high token overlap
+        const isFuzzyMatch = (a, b) => {
+          if (!a || !b) return false;
+          if (a === b) return true;
+          if (a.length > 3 && b.length > 3 && (a.includes(b) || b.includes(a))) return true;
+          const at = new Set(a.split(' '));
+          const bt = new Set(b.split(' '));
+          const intersection = [...at].filter(t => bt.has(t));
+          const unionSize = new Set([...at, ...bt]).size || 1;
+          return intersection.length / unionSize >= 0.66; // modest overlap threshold
+        };
+
+        const hasFuzzyOverlap = (arr1, arr2) => {
+          for (const v1 of arr1) {
+            for (const v2 of arr2) {
+              if (isFuzzyMatch(v1, v2)) return true;
+            }
+          }
+          return false;
         };
         
         // Curated list of meaningful companies/entities from your network
@@ -677,52 +698,35 @@
             const node1 = nodes[i];
             const node2 = nodes[j];
             
-            // 1. Work experience connections (highest priority)
+            // 1. Work experience connections (fuzzy)
             const companies1 = getWorkCompanies(node1.workExperience);
             const companies2 = getWorkCompanies(node2.workExperience);
-            const commonCompanies = companies1.filter(company => companies2.includes(company));
-            
-            if (commonCompanies.length > 0) {
+            if (hasFuzzyOverlap(companies1, companies2)) {
               links.push({
                 source: node1.id,
                 target: node2.id,
-                semanticConnection: `Both worked at: ${commonCompanies[0]}`,
-                connectionType: 'worked_same_company',
+                semanticConnection: 'Shared work experience',
+                connectionType: 'shared_work',
                 strength: 95
               });
               continue; // Skip other connection types
             }
             
-            // 2. Elite education connections
-            const schools1 = getEliteSchools(node1.educationHistory);
-            const schools2 = getEliteSchools(node2.educationHistory);
-            const commonSchools = schools1.filter(school => schools2.includes(school));
-            
-            if (commonSchools.length > 0) {
+            // 2. Education connections (fuzzy)
+            const schools1 = getSchools(node1.educationHistory);
+            const schools2 = getSchools(node2.educationHistory);
+            if (hasFuzzyOverlap(schools1, schools2)) {
               links.push({
                 source: node1.id,
                 target: node2.id,
-                semanticConnection: `Both attended: ${commonSchools[0]}`,
-                connectionType: 'same_elite_school',
+                semanticConnection: 'Shared education',
+                connectionType: 'shared_education',
                 strength: 50
               });
               continue; // Skip other connection types
             }
             
-            // 3. Notes connections (lowest priority)
-            const notes1 = getNoteMentions(node1.notes);
-            const notes2 = getNoteMentions(node2.notes);
-            const commonNotes = notes1.filter(word => notes2.includes(word));
-            
-            if (commonNotes.length > 0) {
-              links.push({
-                source: node1.id,
-                target: node2.id,
-                semanticConnection: `Both mentioned: ${commonNotes[0]}`,
-                connectionType: 'mentioned_same_thing',
-                strength: 25
-              });
-            }
+            // Notes-based connections removed by request
           }
         }
         
