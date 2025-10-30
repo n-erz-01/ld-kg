@@ -811,6 +811,16 @@
           
           // Generate semantic links
           myData.links = generateSemanticLinks(myData.nodes);
+
+          // Compute node degree for physics tuning
+          const nodeIdToDegree = new Map();
+          myData.links.forEach(l => {
+            nodeIdToDegree.set(l.source, (nodeIdToDegree.get(l.source) || 0) + 1);
+            nodeIdToDegree.set(l.target, (nodeIdToDegree.get(l.target) || 0) + 1);
+          });
+          myData.nodes.forEach(n => {
+            n.degree = nodeIdToDegree.get(n.id) || 0;
+          });
           console.log('Generated connections:', myData.links.length);
           
           // Re-render the graph with new data
@@ -1319,7 +1329,7 @@
               linkDistance: 100,
               linkStrength: 0.2,
               nodeRepulsion: 1500,
-              nodeStrength: -150,
+              nodeStrength: (n) => (n.degree && n.degree > 0 ? -150 : -60),
               // Add alpha decay to keep movement continuous
               alphaDecay: 0.01,
               // Add velocity decay to keep it slow
@@ -1775,7 +1785,7 @@
                     if (imgMatch) {
                       const alt = imgMatch[1];
                       const url = imgMatch[2];
-                      return `<img src="${url}" alt="${alt}" style="max-width: 50%; height: auto; margin: 16px 0; border: var(--border-medium) solid var(--text-primary);">`;
+                      return `<img src="${url}" alt="${alt}" style="max-width: 65%; height: auto; margin: 16px 0; border: var(--border-medium) solid var(--text-primary);">`;
                     }
                   }
                   
