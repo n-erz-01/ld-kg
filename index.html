@@ -652,13 +652,17 @@
           return intersection.length / unionSize >= 0.66; // modest overlap threshold
         };
 
-        const hasFuzzyOverlap = (arr1, arr2) => {
+        // Return first fuzzy-matched pair and a display value
+        const getFirstFuzzyMatch = (arr1, arr2) => {
           for (const v1 of arr1) {
             for (const v2 of arr2) {
-              if (isFuzzyMatch(v1, v2)) return true;
+              if (isFuzzyMatch(v1, v2)) {
+                const display = v1.length >= v2.length ? v1 : v2;
+                return { a: v1, b: v2, value: display };
+              }
             }
           }
-          return false;
+          return null;
         };
         
         // Curated list of meaningful companies/entities from your network
@@ -701,11 +705,12 @@
             // 1. Work experience connections (fuzzy)
             const companies1 = getWorkCompanies(node1.workExperience);
             const companies2 = getWorkCompanies(node2.workExperience);
-            if (hasFuzzyOverlap(companies1, companies2)) {
+            const workMatch = getFirstFuzzyMatch(companies1, companies2);
+            if (workMatch) {
               links.push({
                 source: node1.id,
                 target: node2.id,
-                semanticConnection: 'Shared work experience',
+                semanticConnection: `Both worked at: ${capitalizeCompany(workMatch.value)}`,
                 connectionType: 'shared_work',
                 strength: 95
               });
@@ -715,11 +720,12 @@
             // 2. Education connections (fuzzy)
             const schools1 = getSchools(node1.educationHistory);
             const schools2 = getSchools(node2.educationHistory);
-            if (hasFuzzyOverlap(schools1, schools2)) {
+            const eduMatch = getFirstFuzzyMatch(schools1, schools2);
+            if (eduMatch) {
               links.push({
                 source: node1.id,
                 target: node2.id,
-                semanticConnection: 'Shared education',
+                semanticConnection: `Both attended: ${capitalizeCompany(eduMatch.value)}`,
                 connectionType: 'shared_education',
                 strength: 50
               });
