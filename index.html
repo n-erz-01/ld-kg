@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🌐 nerz.network</title>
+  <link rel="icon" href="images/@bb-network.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="images/@bb-network.png" sizes="180x180">
   
   <!-- Google Fonts - JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1260,15 +1262,15 @@
                 return ratingMap[node.meetingRating] || 8; // Default size
               },
               nodeColor: (node) => {
-                // Color nodes based on role
+                // Strong, non-light palette by role
                 const roleColors = {
-                  'VC Investor': '#FF6B6B',     
-                  'Startup Operator': '#4ECDC4',     
-                  'VC Operator': '#FFEAA7',       
-                  'Startup Founder': '#98D8C8',     
+                  'Portfolio Founder / Operator': '#FF3D00', // vivid deep orange
+                  'Data in VC': '#00C853',                    // vivid green
+                  'Founder': '#2962FF',                       // strong blue
+                  'Investor': '#D50000',                      // strong red
+                  'Operator': '#6A1B9A'                       // deep purple
                 };
                 const color = roleColors[node.role] || '#CCCCCC';
-                console.log('Node:', node.name, 'Role:', node.role, 'Color:', color);
                 return color;
               },
               nodeCanvasObject: (node, ctx, globalScale) => {
@@ -1276,10 +1278,11 @@
                 
                 // Get the color from our role-based function
                 const roleColors = {
-                  'VC Investor': '#FF6B6B',     
-                  'Startup Operator': '#4ECDC4',     
-                  'VC Operator': '#FFEAA7',       
-                  'Startup Founder': '#98D8C8',     
+                  'Portfolio Founder / Operator': '#FF3D00',
+                  'Data in VC': '#00C853',
+                  'Founder': '#2962FF',
+                  'Investor': '#D50000',
+                  'Operator': '#6A1B9A'
                 };
                 const color = roleColors[node.role] || '#CCCCCC';
                 
