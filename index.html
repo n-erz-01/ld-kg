@@ -1267,13 +1267,12 @@
                 return ratingMap[node.meetingRating] || 8; // Default size
               },
               nodeColor: (node) => {
-                // Strong, non-light palette by role
                 const roleColors = {
-                  'Portfolio Founder / Operator': '#FF3D00', // vivid deep orange
-                  'Data in VC': '#00C853',                    // vivid green
-                  'Founder': '#2962FF',                       // strong blue
-                  'Investor': '#D50000',                      // strong red
-                  'Operator': '#6A1B9A'                       // deep purple
+                  'Portfolio Founder / Operator': '#F65403', 
+                  'Data in VC': '#01619E',                    
+                  'Founder': '#736F26',                       
+                  'Investor': '#FF8901',                      
+                  'Operator': '#FFDB28'                       
                 };
                 const color = roleColors[node.role] || '#CCCCCC';
                 return color;
