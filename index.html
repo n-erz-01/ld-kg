@@ -1267,14 +1267,15 @@
                 return ratingMap[node.meetingRating] || 8; // Default size
               },
               nodeColor: (node) => {
+                // Aesthetic-aligned palette (orange + navy family, no light tones)
                 const roleColors = {
-                  'Portfolio Founder / Operator': '#F65403', 
-                  'Data in VC': '#01619E',                    
-                  'Founder': '#736F26',                       
-                  'Investor': '#FF8901',                      
-                  'Operator': '#FFDB28'                       
+                  'Portfolio Founder / Operator': '#FF6B00', // vivid orange
+                  'Data in VC': '#0B3A5B',                    // deep navy
+                  'Founder': '#214E8A',                       // cobalt navy
+                  'Investor': '#E65100',                      // burnt orange
+                  'Operator': '#16324F'                       // dark navy
                 };
-                const color = roleColors[node.role] || '#CCCCCC';
+                const color = roleColors[node.role] || '#16324F';
                 return color;
               },
               nodeCanvasObject: (node, ctx, globalScale) => {
@@ -1282,13 +1283,13 @@
                 
                 // Get the color from our role-based function
                 const roleColors = {
-                  'Portfolio Founder / Operator': '#FF3D00',
-                  'Data in VC': '#00C853',
-                  'Founder': '#2962FF',
-                  'Investor': '#D50000',
-                  'Operator': '#6A1B9A'
+                  'Portfolio Founder / Operator': '#FF6B00',
+                  'Data in VC': '#0B3A5B',
+                  'Founder': '#214E8A',
+                  'Investor': '#E65100',
+                  'Operator': '#16324F'
                 };
-                const color = roleColors[node.role] || '#CCCCCC';
+                const color = roleColors[node.role] || '#16324F';
                 
                 // Calculate node size based on meeting rating
                 const ratingMap = {
