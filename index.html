@@ -1250,8 +1250,9 @@
           const { createRoot } = ReactDOM;
           const ForceGraph2D = window.ForceGraph2D;
           
-          createRoot(document.getElementById('graph')).render(
-            React.createElement(ForceGraph2D, {
+          const graphRoot = createRoot(document.getElementById('graph'));
+          const graphRef = { current: null };
+          const graphElement = React.createElement(ForceGraph2D, {
               graphData: myData,
               nodeVal: (node) => {
                 // Map meeting rating to node size
@@ -1340,8 +1341,23 @@
               alphaDecay: 0.01,
               // Add velocity decay to keep it slow
               velocityDecay: 0.95
-            })
-          );
+            });
+          graphRoot.render(graphElement);
+          
+          // Store graph instance for node linking (access via DOM after render)
+          setTimeout(() => {
+            const graphContainer = document.getElementById('graph');
+            if (graphContainer && graphContainer.firstChild) {
+              // react-force-graph-2d attaches methods to the canvas element
+              const canvas = graphContainer.querySelector('canvas');
+              if (canvas && canvas.__forceGraph) {
+                window.fg = canvas.__forceGraph;
+              } else {
+                // Fallback: store the container and access methods directly
+                window.fgContainer = graphContainer;
+              }
+            }
+          }, 100);
         }
       }
 
@@ -1720,6 +1736,65 @@
         }
       }
 
+      // Set up click handlers for node links in main text
+      function setupNodeLinkHandlers() {
+        const storyText = document.querySelector('.story-text');
+        if (!storyText) return;
+        
+        // Remove existing listeners (if any) and add new one
+        storyText.removeEventListener('click', handleNodeLinkClick);
+        storyText.addEventListener('click', handleNodeLinkClick);
+      }
+      
+      // Handle clicks on node links
+      function handleNodeLinkClick(e) {
+        const link = e.target.closest('a.node-link');
+        if (!link) return;
+        
+        e.preventDefault();
+        const nodeId = link.dataset.nodeId?.trim();
+        if (!nodeId || typeof myData === 'undefined' || !myData.nodes) return;
+        
+        // Find node by ID first, then fallback to name match
+        const node = myData.nodes.find(n => n.id === nodeId) ||
+                     myData.nodes.find(n => (n.name || '').toLowerCase() === nodeId.toLowerCase());
+        
+        if (!node) {
+          console.warn('Node not found:', nodeId);
+          return;
+        }
+        
+        // Scroll to graph section
+        const graphSection = document.getElementById('graph-section');
+        if (graphSection) {
+          graphSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // Wait for scroll, then center on node and open popup
+        setTimeout(() => {
+          // Center and zoom on the node if ForceGraph is available
+          const graphContainer = document.getElementById('graph');
+          if (graphContainer && node.x !== undefined && node.y !== undefined) {
+            try {
+              // Try to access graph methods through the container
+              const fg = window.fg || (graphContainer.__reactInternalInstance ? graphContainer.__reactInternalInstance : null);
+              if (fg && typeof fg.centerAt === 'function') {
+                fg.centerAt(node.x, node.y, 800);
+                fg.zoom(2, 800);
+              }
+            } catch (err) {
+              // Graph methods not available, continue without centering
+              console.log('Graph centering not available, opening popup directly');
+            }
+          }
+          
+          // Open the popup
+          if (typeof showPersistentPopup === 'function') {
+            showPersistentPopup(node);
+          }
+        }, 600);
+      }
+
       // Load text section content from database
       async function loadTextSectionContent() {
         try {
@@ -1797,12 +1872,17 @@
                   
                   // Regular paragraphs - process links within the text
                   let processedLine = trimmed;
+                  // Replace node links FIRST [text](node:id) or [text](node:name) - must come before regular links
+                  processedLine = processedLine.replace(/\[([^\]]+)\]\(node:([^)]+)\)/g, '<a href="#" class="node-link" data-node-id="$2" style="color: var(--accent-orange); text-decoration: underline; cursor: pointer;">$1</a>');
                   // Replace markdown links [text](url) with HTML links
                   processedLine = processedLine.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color: var(--accent-orange); text-decoration: underline;">$1</a>');
                   
                   return `<p style="margin-bottom: 12px; line-height: 1.5;">${processedLine}</p>`;
                 })
                 .join('');
+              
+              // Set up click handlers for node links
+              setupNodeLinkHandlers();
             }
           }
           
