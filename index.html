@@ -18,6 +18,8 @@
   
   <!-- Force Graph -->
   <script src="https://unpkg.com/react-force-graph-2d"></script>
+  <!-- SoundCloud Widget API for autoplay control -->
+  <script src="https://w.soundcloud.com/player/api.js"></script>
   
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -381,6 +383,7 @@
           scrolling="no" 
           frameborder="no" 
           allow="autoplay" 
+          id="soundcloud-player"
           src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1791452107&color=%23ff8c00&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
           style="border: var(--border-medium) solid var(--text-primary);">
         </iframe>
@@ -1415,6 +1418,20 @@
         
         // Process markdown links in welcome section
         processWelcomeLinks();
+        
+        // Initialize SoundCloud autoplay using Widget API
+        try {
+          const scIframe = document.getElementById('soundcloud-player');
+          if (scIframe && window.SC && typeof window.SC.Widget === 'function') {
+            const widget = window.SC.Widget(scIframe);
+            widget.bind(window.SC.Widget.Events.READY, function() {
+              widget.setVolume(100);
+              widget.play();
+            });
+          }
+        } catch (e) {
+          console.warn('SoundCloud autoplay init skipped:', e);
+        }
         
         // Auth form submission
         const authForm = document.getElementById('auth-form');
