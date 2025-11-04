@@ -1380,7 +1380,10 @@
         const welcomeText = document.getElementById('welcome-text');
         if (welcomeText) {
           const text = welcomeText.innerHTML;
-          const processedText = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color: var(--accent-orange); text-decoration: underline;">$1</a>');
+          // Handle node links first
+          let processedText = text.replace(/\[([^\]]+)\]\(node:([^)]+)\)/g, '<a href="#" class="node-link" data-node-id="$2" style="color: var(--accent-orange); text-decoration: underline; cursor: pointer;">$1</a>');
+          // Then regular links
+          processedText = processedText.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color: var(--accent-orange); text-decoration: underline;">$1</a>');
           welcomeText.innerHTML = processedText;
         }
       }
@@ -1738,12 +1741,9 @@
 
       // Set up click handlers for node links in main text
       function setupNodeLinkHandlers() {
-        const storyText = document.querySelector('.story-text');
-        if (!storyText) return;
-        
-        // Remove existing listeners (if any) and add new one
-        storyText.removeEventListener('click', handleNodeLinkClick);
-        storyText.addEventListener('click', handleNodeLinkClick);
+        // Delegate at the document level so it works in all sections
+        document.removeEventListener('click', handleNodeLinkClick, true);
+        document.addEventListener('click', handleNodeLinkClick, true);
       }
       
       // Handle clicks on node links
