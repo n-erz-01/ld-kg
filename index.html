@@ -314,7 +314,6 @@
       <h2 class="auth-title" style="display: flex; align-items: center; justify-content: center;">
         <img src="images/bb-network.png" alt="nerz.network" style="height: 24px; width: 24px; display: inline-block;" />
       </h2>
-      <p class="auth-subtitle">Enter your credentials to access the network</p>
       
       <form id="auth-form">
         <input type="text" id="user-name" class="auth-input" placeholder="Your name" required>
@@ -352,15 +351,15 @@
           <img src="images/bb-network.png" alt="nerz.network" style="height: 18px; width: 18px; display: inline-block;" />
         </div>
         <div style="font-size: 11px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 10px;" id="welcome-text">
-          Last month I traveled to Munich for [Bits & Pretzels](https://www.bitsandpretzels.com/), one of Europe's largest startup conferences, then spent a week in London - working remotely while meeting founders and data leaders from top European VCs. I wanted to understand how Europe's ecosystem really works: the capital dynamics, the product culture, and how funds are building with AI. This site brings these learnings to life.
-          The boxes on the right aren't just for fun. They are the mapped network of people I met on my trip, and detailed notes of our meetings.
+          Last month I traveled to Munich for [Bits & Pretzels](https://www.bitsandpretzels.com/), one of Europe's largest startup conferences,  then spent a week in London meeting founders and data leaders from top VCs. My goal was to understand how Europe's ecosystem actually works: the capital dynamics, product culture, and how funds are building with AI. This site brings these learnings to life.
+          The boxes on the right aren't just for fun. They are the mapped network of people I met, with detailed notes from each conversation.
         </div>
         <div style="font-size: 11px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 10px;">
           <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">THE BOXES = PEOPLE</div>
           <div>The bigger the box, the better the meeting.</div>
         </div>
         <div style="font-size: 11px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 10px;">
-          <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">THE CONNECTIONS = LINKED COMPANY MENTIONS</div>
+          <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">THE CONNECTIONS = SHARED EXPERIENCES</div>
           <div>Nodes are connected when people have shared work experience or education.</div>
         </div>
         <div style="font-size: 11px; line-height: 1.5; color: var(--text-secondary);">
@@ -368,7 +367,7 @@
           <div>1. Play the song below to step into the network</div>
           <div>2. Read through the summary below</div>
           <div>3. Click on each of the nodes and read the meeting notes</div>
-          <div>4. Click 'Show Enriched Profile' to get their work experience and education (thanks to Aviato)</div>
+          <div>4. Click 'Show Enriched Profile' to get their work experience and education (thanks to [Aviato](https://www.aviato.com/))</div>
           <div>5. Drag and re-configure the nodes! It's fun.</div>
           <div>6. Like and comment at the bottom of the summary, or on the individual nodes.</div>
         </div>
@@ -1137,10 +1136,10 @@
               <!-- Collapsible Sections -->
               <div style="margin: 12px 0;">
                 <button id="enriched-profile-btn-${node.id}" onclick="toggleEnrichedProfile('${node.id}')" class="popup-button">
-                  🔍 SHOW ENRICHED PROFILE
+                  SHOW ENRICHED PROFILE
                 </button>
                 <button id="notes-btn-${node.id}" onclick="toggleNotes('${node.id}')" class="popup-button">
-                  📝 COLLAPSE NOTES
+                  COLLAPSE NOTES
                 </button>
               </div>
               
@@ -1148,7 +1147,7 @@
               <div id="enrichment-${node.id}" style="margin-top: 8px; display: none;">
                 <div style="border-top: var(--border-thin) solid var(--text-primary); padding-top: 8px;">
                   <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                    <h4 style="margin: 0; color: var(--accent-orange); font-family: var(--font-family); font-weight: 700; font-size: 12px; text-transform: uppercase;">✨ AVIATO ENRICHMENT</h4>
+                    <h4 style="margin: 0; color: var(--accent-orange); font-family: var(--font-family); font-weight: 700; font-size: 12px; text-transform: uppercase;">AVIATO ENRICHMENT</h4>
                     <div id="enrichment-status-${node.id}" style="font-size: 10px; color: var(--text-muted); font-family: var(--font-family);"></div>
                   </div>
                   
@@ -1161,7 +1160,7 @@
               <!-- Notes Section -->
               <div id="notes-${node.id}" style="margin-top: 8px; display: block;">
                 <div style="border-top: var(--border-thin) solid var(--text-primary); padding-top: 8px;">
-                  <h4 style="margin: 0 0 8px 0; color: var(--text-primary); font-family: var(--font-family); font-weight: 700; font-size: 12px; text-transform: uppercase;">📝 NOTES</h4>
+                  <h4 style="margin: 0 0 8px 0; color: var(--text-primary); font-family: var(--font-family); font-weight: 700; font-size: 12px; text-transform: uppercase;">NOTES</h4>
                   <div style="font-family: var(--font-family); font-weight: 400; font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
                     ${formatNotesText(node.notes)}
                   </div>
@@ -1269,7 +1268,7 @@
                 // Aesthetic-aligned palette (orange + navy family, no light tones)
                 const roleColors = {
                   'Portfolio Founder / Operator': '#FF6B00',
-                  'Data in VC': '#0B3A5B',
+                  'Data in VC': '#4ECDC4',
                   'Founder': '#214E8A',
                   'Investor': '#E65100',
                   'Operator': '#16324F'
@@ -1283,7 +1282,7 @@
                 // Get the color from our role-based function
                 const roleColors = {
                   'Portfolio Founder / Operator': '#FF6B00',
-                  'Data in VC': '#0B3A5B',
+                  'Data in VC': '#4ECDC4',
                   'Founder': '#214E8A',
                   'Investor': '#E65100',
                   'Operator': '#16324F'
@@ -1571,9 +1570,9 @@
           notesSection.style.display = 'block';
           
           // Update button text and classes
-          enrichedProfileBtn.textContent = '🔍 SHOW ENRICHED PROFILE';
+          enrichedProfileBtn.textContent = 'SHOW ENRICHED PROFILE';
           enrichedProfileBtn.className = 'popup-button';
-          notesBtn.textContent = '📝 COLLAPSE NOTES';
+          notesBtn.textContent = 'COLLAPSE NOTES';
           notesBtn.className = 'popup-button';
           
           // Reset popup color
@@ -1586,9 +1585,9 @@
           notesSection.style.display = 'none';
           
           // Update button text and classes
-          enrichedProfileBtn.textContent = '🔍 HIDE ENRICHED PROFILE';
+          enrichedProfileBtn.textContent = 'HIDE ENRICHED PROFILE';
           enrichedProfileBtn.className = 'popup-button enriched-active';
-          notesBtn.textContent = '📝 EXPAND NOTES';
+          notesBtn.textContent = 'EXPAND NOTES';
           notesBtn.className = 'popup-button';
           
           // Trigger enrichment if not already loaded
@@ -1609,7 +1608,7 @@
         if (isNotesVisible) {
           // Hide notes
           notesSection.style.display = 'none';
-          notesBtn.textContent = '📝 EXPAND NOTES';
+          notesBtn.textContent = 'EXPAND NOTES';
           notesBtn.className = 'popup-button';
           
           // Reset popup color
@@ -1622,9 +1621,9 @@
           enrichmentSection.style.display = 'none';
           
           // Update button text and classes
-          notesBtn.textContent = '📝 COLLAPSE NOTES';
+          notesBtn.textContent = 'COLLAPSE NOTES';
           notesBtn.className = 'popup-button active';
-          enrichedProfileBtn.textContent = '🔍 SHOW ENRICHED PROFILE';
+          enrichedProfileBtn.textContent = 'SHOW ENRICHED PROFILE';
           enrichedProfileBtn.className = 'popup-button';
         }
       }
